@@ -20,7 +20,8 @@ export interface DomainDef {
   usesCamera: boolean // false면 카메라를 요청하지 않고 통화 화면으로 진행 (전화 상황)
   lang?: 'ko' | 'en' // 대화 언어. 음성 인식·합성에 반영. 기본 ko
   hideTitleBeforeStart?: boolean // 준비 화면에서 제목을 숨김 (판별 훈련)
-  callMode?: 'phone' | 'desk' // usesCamera false 일 때 화면 표기: 전화(통화 중) 또는 책상 점검(점검 중). 기본 phone
+  callMode?: 'phone' | 'desk' // usesCamera false 일 때 화면 종류: 전화(기본) 또는 대면·책상
+  callLabel?: string // usesCamera false 일 때 상태 표기 명사: '통화'(기본) / '점검' / '면담' 등 → "○○ 중 00:12", "○○ 종료"
   fields: FieldDef[]
   presets: Record<string, string>[]
   /** 긴 문서 입력(선택). 붙여넣기 또는 PDF·TXT 드롭. 브라우저에서 텍스트만 추출해 fields[key]로 보낸다 */
@@ -39,6 +40,7 @@ export const DOMAINS: DomainDef[] = [
     answerHint: '진행자가 듣고 있습니다. 답하세요',
     usesCamera: false,
     callMode: 'desk',
+    callLabel: '점검',
     fields: [
       { key: 'meeting', label: '회의 이름·목적', placeholder: '예: 제품 개발 기획 리뷰 / 신규 기능 킥오프' },
       { key: 'role', label: '내 역할', placeholder: '기획 / 프론트엔드 / 백엔드 / QA / 디자인' },
@@ -59,7 +61,7 @@ export const DOMAINS: DomainDef[] = [
   {
     id: 'claim_appeal',
     icon: '📄',
-    name: '보험 청구 거절 이의신청 (고객)',
+    name: '보험 청구 거절 이의신청',
     short: '청구 이의',
     description: '보험사가 거절하거나 삭감한 청구 건으로 보상 담당자에게 전화해 이의를 제기합니다. 실손뿐 아니라 암·진단비, 운전자, 자동차, 상해·후유장해, 치아, 펫, 여행자 보험까지 종류를 고를 수 있습니다. 서면 사유·약관 조항 요구, 재심사, 의료자문 대응(제3의료기관 동시감정), 손해사정사 선임권, 금감원 민원까지 2025~26 실제 절차와 분쟁조정 사례 기반. 부지급이 정당한 건도 섞여 있어 판단력도 봅니다.',
     counterpart: '보상 담당자',
@@ -92,7 +94,7 @@ export const DOMAINS: DomainDef[] = [
   {
     id: 'claim_inquiry',
     icon: '🩹',
-    name: '보험금 청구 전 문의 (고객)',
+    name: '보험 청구 전 문의',
     short: '청구 문의',
     description: '다치거나 아파서 보험사 고객센터에 전화하기 전, 떨리는 그 통화를 미리 해 봅니다. 내 진단·치료로 어떤 항목이 청구되는지, 서류에 무엇이 적혀 있어야 하는지, 방법·기간·접수번호까지 묻는 연습. 상담원은 지급을 확정하지 않으므로 "심사 결과에 따라"에서 한 발 더 묻는 법을 봅니다. 2025~26 청구 절차(3영업일·30영업일, 소멸시효 3년, 실손24) 기반. 카메라 없음.',
     counterpart: '고객센터 상담원',
@@ -120,7 +122,7 @@ export const DOMAINS: DomainDef[] = [
   {
     id: 'insurance_purchase',
     icon: '📝',
-    name: '보험 가입 상담 (고객)',
+    name: '보험 상담 (고객)',
     short: '가입 상담',
     description: '보험 설계사가 새 보험을 권하는 전화를 받습니다. 보장 범위와 제외, 면책·감액 기간, 갱신형 보험료와 총 납입액, 무·저해지 환급금 구조, 고지의무, 2026년 판매수수료 등급, 갈아타기(승환) 유도까지 물어야 할 것을 물고, 밀어붙임에 즉답을 미루는 연습. 설계사 유형(정석·밀어붙임·승환 유도·정보 과다)은 AI가 정합니다. 카메라 없음.',
     counterpart: '보험 설계사',
@@ -405,8 +407,9 @@ export const DOMAINS: DomainDef[] = [
     description: '지인이 돈을 빌려달라고 할 때 관계를 지키며 거절하거나, 반대로 내가 예의 있게 부탁하는 연습. 상대는 급함·죄책감·금액 낮추기 같은 실제 압박 패턴을 쓰고, 셋 중 하나는 사정이 진짜인 정상 부탁이라 판단력도 함께 봅니다.',
     counterpart: '지인',
     startLabel: '대화 시작',
+    usesCamera: false,
+    callLabel: '대화',
     answerHint: '지인이 듣고 있습니다. 말씀하세요',
-    usesCamera: true,
     fields: [
       { key: 'side', label: '내 역할', placeholder: '거절하는 쪽 (지인이 빌려달라고 함) / 빌리는 쪽 (내가 부탁)' },
       { key: 'relation', label: '관계', placeholder: '예: 5년 지기 친구 / 옆 팀 동료 / 사촌 형' },
@@ -433,8 +436,10 @@ export const DOMAINS: DomainDef[] = [
     description: '자녀 문제(따돌림 의심, 성적 하락, 생활지도, 교우관계, 과목 선택)로 담임교사와 15분 면담합니다. 담임은 내가 모르는 관찰 사실을 갖고 있고, 학교폭력 절차·생활지도 고시·2026 스마트폰 금지법·고교학점제 같은 최신 제도를 정확히 안내합니다.',
     counterpart: '담임교사',
     startLabel: '면담 시작',
+    usesCamera: false,
+    callMode: 'desk',
+    callLabel: '면담',
     answerHint: '선생님이 듣고 있습니다. 말씀하세요',
-    usesCamera: true,
     fields: [
       { key: 'child', label: '자녀', placeholder: '예: 초4 딸 / 중2 아들 / 고1 아들' },
       { key: 'topic', label: '상담 주제 (신청서)', placeholder: '예: 따돌림 의심 / 성적 하락 / 수업 중 스마트폰 / 과목 선택' },

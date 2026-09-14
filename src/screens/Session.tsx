@@ -423,7 +423,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
             <div className={`call-avatar ${phase === 'interviewer' ? 'talking' : ''}`}>{scenario.interviewer.name[0]}</div>
             <div className="call-name">{scenario.interviewer.name}</div>
             <div className="call-status">
-              {phase === 'done' ? (dom.callMode === 'desk' ? '점검 종료' : '통화 종료') : `${dom.callMode === 'desk' ? '점검 중' : '통화 중'} ${mm}:${ss}`}
+              {phase === 'done' ? `${dom.callLabel ?? '통화'} 종료` : `${dom.callLabel ?? '통화'} 중 ${mm}:${ss}`}
             </div>
             <div className="call-wave">{phase === 'interviewer' ? '상대가 말하는 중' : phase === 'listening' ? (textMode ? '답변 입력 대기' : '내 차례') : phase === 'thinking' ? '…' : ''}</div>
             {realOverlays}

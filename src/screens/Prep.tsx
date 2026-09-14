@@ -225,7 +225,7 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
       {scenario && !visionSettled && <p className="muted small">시나리오는 준비됐습니다. 시선 보정이 끝나면 시작할 수 있어요.</p>}
       {scenario && serverStage === 'pool_refilled' && <p className="muted small">다음 훈련용 시나리오도 미리 준비해 두었습니다. 같은 설정이면 바로 시작됩니다.</p>}
       {textOnly && <p className="muted small">음성 입력이 불가능해 답변은 텍스트로 입력하게 됩니다. {dom.counterpart} 음성은 그대로 나옵니다.</p>}
-      {!dom.usesCamera && <p className="muted small">{dom.callMode === 'desk' ? '책상에서 하는 점검이라 카메라를 쓰지 않습니다. 답한 내용으로만 평가합니다.' : '전화 상황이라 카메라를 쓰지 않습니다. 목소리와 말한 내용으로만 평가합니다.'}</p>}
+      {!dom.usesCamera && <p className="muted small">{dom.callMode === 'desk' ? '카메라를 쓰지 않는 상황입니다. 말한 내용과 말투로만 평가합니다.' : '전화 상황이라 카메라를 쓰지 않습니다. 목소리와 말한 내용으로만 평가합니다.'}</p>}
       {dom.lang === 'en' && <p className="muted small">영어로 진행됩니다. 음성 인식도 영어로 설정됩니다. 리포트는 한국어로 나옵니다.</p>}
       <label className="real-toggle">
         <input type="checkbox" checked={realMode} onChange={(e) => toggleReal(e.target.checked)} />
