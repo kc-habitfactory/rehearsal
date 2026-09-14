@@ -11,6 +11,7 @@ import { hospital } from './hospital'
 import { immigration } from './immigration'
 import { insuranceConsult } from './insurance-consult'
 import { moneyTalk } from './money-talk'
+import { parentTeacher } from './parent-teacher'
 
 export type { DomainId, DomainPrompts, ScenarioLike, NoteWhere } from './shared'
 export { knownFacts, TTS_INSTRUCTIONS_EN_DEFAULT } from './shared'
@@ -24,6 +25,7 @@ export const DOMAIN_PROMPTS: Record<DomainId, DomainPrompts> = {
   immigration,
   insurance_consult: insuranceConsult,
   money_talk: moneyTalk,
+  parent_teacher: parentTeacher,
 }
 
 export function getDomain(id: unknown): DomainPrompts {

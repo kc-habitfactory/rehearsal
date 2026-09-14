@@ -1,6 +1,6 @@
 /* 훈련 도메인 정의 (클라이언트). 서버의 server/domains.ts와 id를 맞춘다. */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher'
 
 export interface FieldDef {
   key: string
@@ -289,6 +289,33 @@ export const DOMAINS: DomainDef[] = [
       { side: '빌리는 쪽 (내가 부탁)', relation: '친한 친구', amount: '80만 원', situation: '병원비, 다음 달 25일 월급으로 갚을 계획' },
       { side: '빌리는 쪽 (내가 부탁)', relation: '형(친형)', amount: '500만 원', situation: '이사 보증금 부족, 3개월 분할 상환 계획' },
       { side: '빌리는 쪽 (내가 부탁)', relation: '대학 선배', amount: '200만 원', situation: '노트북 고장으로 급히 필요, 두 달 뒤 상환' },
+    ],
+  },
+  {
+    id: 'parent_teacher',
+    name: '학부모 상담',
+    short: '학부모 상담',
+    description: '자녀 문제(따돌림 의심, 성적 하락, 생활지도, 교우관계, 과목 선택)로 담임교사와 15분 면담합니다. 담임은 내가 모르는 관찰 사실을 갖고 있고, 학교폭력 절차·생활지도 고시·2026 스마트폰 금지법·고교학점제 같은 최신 제도를 정확히 안내합니다.',
+    counterpart: '담임교사',
+    startLabel: '면담 시작',
+    answerHint: '선생님이 듣고 있습니다. 말씀하세요',
+    usesCamera: true,
+    fields: [
+      { key: 'child', label: '자녀', placeholder: '예: 초4 딸 / 중2 아들 / 고1 아들' },
+      { key: 'topic', label: '상담 주제 (신청서)', placeholder: '예: 따돌림 의심 / 성적 하락 / 수업 중 스마트폰 / 과목 선택' },
+      { key: 'situation', label: '내가 아는 상황', placeholder: '예: 2주 전부터 학교 가기 싫다고 함, 단톡에서 빠짐' },
+      { key: 'goal', label: '원하는 결과', placeholder: '예: 학교에서 무슨 일이 있는지 확인, 자리 조정' },
+    ],
+    presets: [
+      { child: '초4 딸', topic: '따돌림 의심', situation: '2주 전부터 학교 가기 싫다고 함, 친구 단톡에서 빠졌다고 함', goal: '학교에서 무슨 일이 있는지 확인하고 대응 방법 정하기' },
+      { child: '중2 아들', topic: '학교폭력 피해 신고 여부 상의', situation: '같은 반 아이에게 밀쳐져 멍이 들었고 카톡 욕설 캡처 있음', goal: '신고 절차와 학교가 해 줄 수 있는 것 확인' },
+      { child: '중1 딸', topic: '성적 하락', situation: '1학기 중간 대비 수학·영어 크게 하락, 밤늦게까지 폰을 봄', goal: '원인 파악과 학교에서의 모습 확인' },
+      { child: '고1 아들', topic: '고교학점제 과목 선택 상담', situation: '진로가 정해지지 않아 2학년 선택과목을 못 정함', goal: '선택 기준과 이수 계획 조언' },
+      { child: '초2 아들', topic: '수업 중 돌아다니고 친구를 방해한다는 알림', situation: '집에서는 얌전한데 학교에서 그렇다니 당황', goal: '실제 모습 확인, 가정에서 도울 방법' },
+      { child: '중3 딸', topic: '수업 중 스마트폰 사용으로 분리 조치 받음', situation: '아이가 억울하다고 함, 2026년 법 시행 이후 첫 조치', goal: '상황 확인과 재발 방지' },
+      { child: '초6 아들', topic: '우리 아이가 가해자로 지목됨', situation: '다른 학부모가 학교에 연락했다고 담임이 알림', goal: '사실 확인과 아이 입장 전달, 절차 이해' },
+      { child: '고2 딸', topic: '교우관계와 무기력', situation: '친구를 만나지 않고 성적 관심도 떨어짐', goal: '학교에서의 모습 확인, 상담 연계 가능성' },
+      { child: '초5 아들', topic: '담임의 지도 방식에 대한 불만', situation: '아이가 선생님이 자기만 혼낸다고 함', goal: '오해인지 확인하고 관계 풀기 (감정 조절 훈련)' },
     ],
   },
 ]

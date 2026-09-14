@@ -82,6 +82,12 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['이유를 세 개 이상 나열', '"돈이 없어" 식 애매한 핑계', '상대 비난', '침묵으로 버티다 승낙', '사정만 길게'],
     cpm: [250, 350], answerSec: [4, 25], latencySec: [0.8, 4],
   },
+  parent: {
+    key: 'parent', name: '학부모 상담형: 첫 30초에 주제와 요청, 사실은 육하원칙으로, 교사 관찰은 끝까지',
+    likes: ['첫 문장에 주제와 원하는 것', '"언제·어디서·무엇을" 사실과 증거로', '교사 말을 끊지 않고 되짚기("그러니까 급식 시간에…")', '요청은 조치·기간·연락 방법으로', '감사 인사와 시간 배려'],
+    dislikes: ['감정으로 시작해 사실이 늦게 나옴', '다른 아이·학부모 비난', '교사 관찰에 즉각 반박', '"지켜봐 주세요" 같은 모호한 요구', '상대 학생 처벌·연락처 요구'],
+    cpm: [260, 360], answerSec: [10, 45], latencySec: [0.8, 3],
+  },
   consultant: {
     key: 'consultant', name: '상담사형: 쉬운 말로 한 번에 하나씩, 단정하지 않고, 제안 뒤 침묵을 견디기',
     likes: ['고객 상황을 먼저 묻고 되짚기("~하신 거죠?")', '전문용어는 비유·예시로, 한 번에 한 가지', '"고객님 상황에서는 ~한 경우 유리합니다"처럼 조건부 표현', '핵심 제안 뒤 3~5초 침묵, 결정 재촉 금지', '거절에는 압박 대신 "한두 달 뒤 안부 겸 연락" 수준의 후속 약속'],
@@ -114,6 +120,7 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
     case 'scam_call': return P.firm
     case 'insurance_consult': return P.consultant
     case 'money_talk': return P.boundary
+    case 'parent_teacher': return P.parent
     default: return P.general
   }
 }
