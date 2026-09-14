@@ -29,6 +29,17 @@ export async function findSessionByClientId(userKey: string, clientId: string): 
   return rows[0]?.id ?? null
 }
 
+/** 이력서·공고 원문은 기록에 남기지 않는다 (개인정보). 길이만 표시로 남기고, 요약은 scenario.resumeSummary 에 있다.
+ *  setup.fields 와 scenario.fields(서버가 시나리오 응답에 붙여 준 입력값) 둘 다 적용 */
+function stripDocs<T extends { fields?: Record<string, string> } | undefined>(obj: T): T {
+  const f = obj?.fields
+  if (!obj || !f || (!f.jd && !f.resume)) return obj
+  const fields = { ...f }
+  if (fields.jd) fields.jd = `[채용 공고 ${String(fields.jd).replace(/\s/g, '').length}자 제공됨 · 원문 미저장]`
+  if (fields.resume) fields.resume = `[이력서 ${String(fields.resume).replace(/\s/g, '').length}자 제공됨 · 원문 미저장]`
+  return { ...obj, fields }
+}
+
 export async function saveSession(userKey: string, log: any, report: any | null, reportModel: string | null, status: 'pending' | 'done' | 'failed' = 'done'): Promise<number | null> {
   if (!pool) return null
   const clientId = typeof log?.clientId === 'string' ? log.clientId.slice(0, 64) : null
@@ -43,8 +54,8 @@ export async function saveSession(userKey: string, log: any, report: any | null,
       userKey,
       String(log?.setup?.domain ?? 'interview').slice(0, 30),
       String(log?.scenario?.title ?? '').slice(0, 200),
-      JSON.stringify(log.setup ?? {}),
-      JSON.stringify(log.scenario ?? {}),
+      JSON.stringify(stripDocs(log.setup ?? {})),
+      JSON.stringify(stripDocs(log.scenario ?? {})),
       JSON.stringify(log.turns ?? []),
       JSON.stringify(log.events ?? []),
       JSON.stringify(log.overall ?? {}),

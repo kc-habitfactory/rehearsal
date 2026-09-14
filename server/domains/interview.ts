@@ -5,24 +5,43 @@ import { interviewBriefForDesigner, interviewBriefForCoach } from '../cases/inte
 export const interview: DomainPrompts = {
   id: 'interview',
   voice: { voice: 'nova', instructions: '30대 후반 실무 팀 리드. 차분하고 단정한 한국어, 문장 끝을 분명하게. 감정을 크게 드러내지 않고 질문은 또렷하게.' },
-  describeInput: (f) => `직무: ${f.role}\n회사 유형: ${f.company}\n면접 단계: ${f.stage}\n경력: ${f.years}`,
+  describeInput: (f) => {
+    const base = `직무: ${f.role}\n회사 유형: ${f.company}\n면접 단계: ${f.stage}\n경력: ${f.years}`
+    const jd = (f.jd ?? '').trim().slice(0, 6000)
+    const resume = (f.resume ?? '').trim().slice(0, 6000)
+    return base + (jd ? `\n\n===== 채용 공고 =====\n${jd}` : '') + (resume ? `\n\n===== 지원자 이력서 =====\n${resume}` : '')
+  },
   scenarioSystem: (f) => `당신은 모의 면접 시나리오 설계자다. 입력된 직무·회사 유형·면접 단계·경력을 바탕으로 5분짜리 음성 모의 면접 시나리오를 만든다.
 질문은 아래 "실제 질문"과 "꼬리질문 연쇄"를 참고하되 문장을 그대로 쓰지 않는다. 직무·회사 유형·경력에 맞게 소재와 표현을 바꾸고, 회사 유형(핀테크·커머스·게임 등)의 실제 상황을 질문에 녹인다. 같은 설정으로 두 번 생성해도 첫 질문이 달라야 한다. 신입에게 경력 5년 질문을 하지 않고, 임원 면접이면 기술 디테일보다 판단·동기·조직 적합성을 묻는다.
 hiddenPlan에는 (1) 첫 질문에 이어질 꼬리질문 연쇄 2~3단계, (2) 이 직군에서 파고들 지점, (3) 돌발 변수 1~2개(답변 도중 끊고 반박, "그건 흔한 접근인데요", 시간 압박, 수치 근거 추궁, 답변 간 모순 지적)를 적는다.
+${(f.jd ?? '').trim() || (f.resume ?? '').trim() ? `
+[공고·이력서가 주어졌다] 실제 면접관처럼 두 문서를 대조해 질문을 만든다.
+- 우선순위: 공고가 있으면 직무·회사·요구 경력은 공고 본문을 기준으로 삼는다. 위의 짧은 칸(직무·회사 유형)과 다르면 공고를 따르고 title도 공고의 직무로 쓴다. 짧은 칸은 공고에 없는 정보(면접 단계, 지원자 경력 연차)를 채우는 보조로만 쓴다.
+- 이력서의 직무와 공고의 직무가 다르면(예: 백엔드 이력서로 데이터 엔지니어 공고) 그것은 전환 지원 면접이다. 면접관이 그 차이를 직접 짚는 질문("이력서는 ○○인데 이 자리는 △△입니다. 왜 지원하셨고 무엇으로 갭을 메우실 건가요")을 hiddenPlan에 넣는다.
+- 공고 요구사항 중 이력서가 증명하는 항목 → 구체 사실을 확인하는 검증 질문("이력서에 ○○라고 쓰셨는데, 어떤 상황에서 왜 그 선택을 했나요")
+- 공고에는 있는데 이력서에 없는 항목(갭) → 압박 질문("○○ 경험이 요구되는데 이력서에는 보이지 않네요. 어떻게 채우실 건가요")
+- 이력서의 수치·성과("40% 개선" 등) → 측정 방법·본인 기여분 추궁
+- 첫 질문(opening)부터 이력서의 실제 항목(프로젝트명·회사·수치)을 인용한다. 일반 질문으로 시작하지 않는다.
+- hiddenPlan 첫 줄에 "요구사항 커버리지 계획: [요구사항] → [어느 턴에서 확인]" 목록을 적는다.
+- 아래 JSON에 "resumeSummary"(이력서 핵심 5줄 이내, 개인 연락처·주민번호·주소는 절대 포함 금지)와 "jdRequirements"(공고 요구·우대사항을 항목별 짧은 문장 4~8개)를 추가로 채운다. 이력서 원문은 저장되지 않고 이 요약만 남는다.` : ''}
 반드시 아래 JSON만 출력한다. 설명이나 마크다운을 붙이지 않는다.
 {
   "title": "면접 제목 (예: 핀테크 백엔드 경력 3년 2차 실무 면접)",
   "interviewer": { "name": "면접관 이름", "style": "성향 한 줄 (예: 꼬리질문을 집요하게 던지는 실무 리드 / 부드럽지만 수치를 꼭 확인하는 팀장 / 컬처핏을 보는 임원)" },
   "opening": "면접관의 첫 인사와 첫 질문. 두 문장 이내, 자연스러운 한국어 구어체.",
-  "hiddenPlan": "면접관 내부 계획. 사용자에게 노출되지 않음."
+  "hiddenPlan": "면접관 내부 계획. 사용자에게 노출되지 않음.",
+  "resumeSummary": "(이력서가 있을 때만) 핵심 5줄 이내",
+  "jdRequirements": ["(공고가 있을 때만) 요구사항 1", "요구사항 2"]
 }
 매번 다른 성향과 돌발 변수를 고른다.
 
-${interviewBriefForDesigner(`${f.role ?? ''} ${f.company ?? ''} ${f.stage ?? ''}`)}`,
+${interviewBriefForDesigner(`${f.role ?? ''} ${f.company ?? ''} ${f.stage ?? ''} ${(f.jd ?? '').slice(0, 300)}`)}`,
   counterpartSystem: (s) => `당신은 "${s.title}"의 면접관 ${s.interviewer.name}이다. 성향: ${s.interviewer.style}.
 내부 계획(지원자에게 절대 노출 금지): ${s.hiddenPlan}
 이력서로 이미 알고 있는 지원자 정보(다시 묻지 말고 전제로 삼는다):
 ${knownFacts(s.fields, [['role', '지원 직무'], ['company', '회사 유형'], ['stage', '면접 단계'], ['years', '경력']]) || '- (없음)'}
+${s.resumeSummary ? `이력서 요약(질문할 때 "이력서에 쓰신 ○○"처럼 구체 항목을 인용한다):\n${s.resumeSummary}` : ''}
+${s.jdRequirements?.length ? `공고 요구사항(내부 계획의 커버리지 순서대로 확인한다):\n${s.jdRequirements.map((r) => `- ${r}`).join('\n')}` : ''}
 
 규칙
 - 실제 사람이 말하듯 자연스러운 한국어 구어체. 음성으로 읽힌다. 마크다운, 목록, 괄호 지시문 금지.
@@ -36,6 +55,7 @@ ${knownFacts(s.fields, [['role', '지원 직무'], ['company', '회사 유형'],
 - 답변 구조는 STAR(상황·과제·행동·결과) 또는 PREP(포인트·이유·예시·재강조) 기준으로 무엇이 빠졌는지 말한다. 특히 "왜 그렇게 판단했는지", "검토한 대안", "본인 기여분", "숫자"가 있었는지 본다.
 - 비언어는 관찰 사실과 타임라인으로 말한다. 예: "1분 40초, 반박을 받은 직후 시선이 5초간 아래로 내려갔습니다." 성격이나 감정을 단정하지 않는다("긴장한 것처럼 보일 수 있습니다" 수준까지만).
 - 다음 훈련 제안은 한 가지, 실행 가능한 것으로. 이번에 약했던 꼬리질문 유형을 지정해 준다.
+${log?.scenario?.jdRequirements?.length ? `- [공고 커버리지] 아래 공고 요구사항마다 지원자가 답변으로 증명했는지 판정해 JSON에 "coverage": [{ "requirement": "요구사항", "status": "증명" | "부분" | "미답", "note": "근거 한 문장(인용)" }] 배열을 추가한다. "미답"은 면접관이 묻지 않았거나 지원자가 비켜간 것 모두 포함. nextTraining은 "미답"·"부분" 중 하나를 지정한다.\n공고 요구사항: ${log.scenario.jdRequirements.join(' / ')}${log?.scenario?.resumeSummary ? `\n이력서 요약: ${log.scenario.resumeSummary}` : ''}` : ''}
 ${interviewBriefForCoach(`${log?.setup?.fields?.role ?? ''} ${log?.scenario?.title ?? ''}`)}
 ${REPORT_JSON}`,
   mockScenario: (f) => ({

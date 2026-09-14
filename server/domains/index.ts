@@ -43,9 +43,11 @@ function nameNoteFor(dom: DomainPrompts, fields: Record<string, string> | undefi
 }
 
 /** 시나리오 설계자 system 프롬프트 */
+const JSON_HYGIENE = `\n\n[출력 형식] 유효한 JSON 하나만 출력한다. 문자열 값 안에서 무언가를 인용할 때는 쌍따옴표(")를 쓰지 말고 홑따옴표(')나 「」를 쓴다. 줄바꿈은 \\n 으로. 마크다운 코드 펜스는 붙이지 않는다.`
+
 export function buildDesignerSystem(dom: DomainPrompts, fields: Record<string, string>): string {
   const base = typeof dom.scenarioSystem === 'function' ? dom.scenarioSystem(fields) : dom.scenarioSystem
-  return base + habitfactoryDesignerNote(dom.id, fields) + nameNoteFor(dom, fields, 'designer')
+  return base + habitfactoryDesignerNote(dom.id, fields) + nameNoteFor(dom, fields, 'designer') + JSON_HYGIENE
 }
 
 /** 대화 상대(면접관·발신자·의사…) system 프롬프트 */
@@ -60,5 +62,5 @@ export function buildCoachSystem(dom: DomainPrompts, log: any): string {
     ? `\n[실전 모드] 훈련자는 실시간 지표·자막·대화 기록을 보지 않고 화면(상대)만 보며 진행했다. 실전과 같은 조건이므로 (1) 비언어 지표와 이벤트 타임라인을 더 자세히 짚고, (2) 자막 없이 들은 만큼 질문을 놓치거나 잘못 들은 지점이 있는지 확인하고, (3) headline에 실전 모드였음을 한 번 언급한다.`
     : ''
   const speech = speechBriefForCoach(dom.id, log?.setup?.fields, log?.turns, dom.lang ?? 'ko')
-  return base + real + speech + nameNoteFor(dom, log?.setup?.fields, 'coach')
+  return base + real + speech + nameNoteFor(dom, log?.setup?.fields, 'coach') + JSON_HYGIENE
 }

@@ -21,6 +21,8 @@ export interface DomainDef {
   hideTitleBeforeStart?: boolean // 준비 화면에서 제목을 숨김 (판별 훈련)
   fields: FieldDef[]
   presets: Record<string, string>[]
+  /** 긴 문서 입력(선택). 붙여넣기 또는 PDF·TXT 드롭. 브라우저에서 텍스트만 추출해 fields[key]로 보낸다 */
+  docs?: { key: string; label: string; hint: string; sample?: { label: string; text: string } }[]
 }
 
 export const DOMAINS: DomainDef[] = [
@@ -38,6 +40,30 @@ export const DOMAINS: DomainDef[] = [
       { key: 'company', label: '회사 유형', placeholder: '예: 핀테크 스타트업 / 해빗팩토리' },
       { key: 'stage', label: '면접 단계' },
       { key: 'years', label: '경력' },
+    ],
+    docs: [
+      {
+        key: 'jd', label: '채용 공고 (선택)', hint: '공고 본문을 붙이거나 PDF·TXT를 놓으세요. 요구사항과 내 이력서를 대조해 질문을 만듭니다.',
+        sample: {
+          label: '해빗팩토리 백엔드 공고 예시 넣기',
+          text: `[예시 공고 · 실제 공고와 다를 수 있습니다]
+해빗팩토리 백엔드 개발자 (경력 3년 이상)
+담당 업무
+- 시그널플래너 보험 분석 서비스의 백엔드 API 설계·운영 (보험사·기관 데이터 연동, 보험 분석 리포트, 숨은보험금 조회)
+- 외부 기관 연동의 안정성 확보: 타임아웃·재시도·멱등성, 장애 격리, 관측(로그·메트릭·트레이스)
+- 상담 신청 → 상담사 배정 흐름과 알림(문자·앱 푸시) 파이프라인 개발
+- 금융 데이터 보안·개인정보 처리 기준 준수
+자격 요건
+- Node.js/TypeScript 또는 Java/Kotlin 서버 개발 3년 이상
+- MySQL 등 RDB 설계·튜닝 경험, Redis·메시지 큐(RabbitMQ/Kafka) 운영 경험
+- 장애를 직접 분석하고 재발 방지까지 이어간 경험
+우대 사항
+- 보험·핀테크 도메인 경험, 마이데이터·기관 연동 경험
+- LLM API를 서비스에 붙여 본 경험(프롬프트·평가·비용 관리)
+- 작은 팀에서 기획·프론트와 직접 소통하며 기능을 끝까지 만든 경험`,
+        },
+      },
+      { key: 'resume', label: '내 이력서 (선택)', hint: '이력서·경력기술서를 붙이거나 PDF·TXT를 놓으세요. 면접관이 이력서의 프로젝트·수치를 인용해 묻습니다. 원문은 저장하지 않고 요약만 남습니다.' },
     ],
     presets: [
       { role: '백엔드 개발자', company: '핀테크 스타트업', stage: '2차 실무 면접', years: '경력 3년' },

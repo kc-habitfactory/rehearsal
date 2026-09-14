@@ -57,15 +57,41 @@ function setupHash(domainId: string, input: string) {
 }
 
 async function generateScenario(domainId: string, input: string, fields: Record<string, string> = {}) {
+  // 공고·이력서가 붙으면 요약·요구사항·커버리지 계획까지 나와 출력이 길다. 1500이면 잘려서 opening이 사라진다
+  const long = Boolean(fields.jd?.trim() || fields.resume?.trim())
   const msg = await client!.messages.create({
     model: SCENARIO_MODEL,
-    max_tokens: 1500,
+    max_tokens: long ? 4000 : 2000,
     output_config: { effort: 'low' },
     system: buildDesignerSystem(getDomain(domainId), fields),
     messages: [{ role: 'user', content: input }],
   })
+  if (msg.stop_reason === 'max_tokens') console.warn('[scenario] output hit max_tokens')
   const text = msg.content.filter((b) => b.type === 'text').map((b) => b.text).join('')
-  return JSON.parse(extractJson(text))
+  const sc = await parseJsonWithRepair(text)
+  for (const k of ['title', 'opening', 'hiddenPlan'] as const) {
+    if (typeof sc?.[k] !== 'string' || !sc[k].trim()) throw new Error(`scenario missing "${k}" (stop_reason=${msg.stop_reason})`)
+  }
+  if (typeof sc?.interviewer?.name !== 'string') throw new Error('scenario missing interviewer.name')
+  return sc
+}
+
+/** 모델이 낸 JSON을 파싱한다. 문자열 안의 쌍따옴표 같은 문법 오류면 빠른 모델로 문법만 고쳐 한 번 더 시도한다 */
+async function parseJsonWithRepair(text: string): Promise<any> {
+  const raw = extractJson(text)
+  try {
+    return JSON.parse(raw)
+  } catch (e) {
+    console.warn('[scenario] JSON parse failed, repairing:', String(e).slice(0, 120))
+    const fix = await client!.messages.create({
+      model: TURN_MODEL,
+      max_tokens: 6000,
+      system: '아래는 문법 오류가 있는 JSON이다. 내용은 한 글자도 바꾸지 말고 문법만 고쳐서(문자열 안의 쌍따옴표는 홑따옴표로, 누락된 쉼표·괄호 보정) 유효한 JSON 하나만 출력한다. 설명·코드 펜스 금지.',
+      messages: [{ role: 'user', content: raw }],
+    })
+    const fixed = fix.content.filter((b) => b.type === 'text').map((b) => b.text).join('')
+    return JSON.parse(extractJson(fixed))
+  }
 }
 
 /** 배경에서 풀을 채운다. 잠금으로 중복 생성을 막는다. */
@@ -110,7 +136,8 @@ app.post('/api/scenario', async (req, res) => {
       res.json({ ...(await generateScenario(dom.id, input, fields)), domain: dom.id, fields })
       push('done')
     }
-    void refillPool(hash, dom.id, input, fields, userKey)
+    // 공고·이력서가 붙은 요청은 매번 고유하므로 풀을 미리 채우지 않는다 (opus 호출 낭비)
+    if (!fields.jd?.trim() && !fields.resume?.trim()) void refillPool(hash, dom.id, input, fields, userKey)
   } catch (e) {
     console.error(e)
     push('failed')
@@ -174,13 +201,19 @@ async function generateReport(log: any): Promise<{ report: any; model: string }>
   const run = async (model: string) => {
     const msg = await client!.messages.create({
       model,
-      max_tokens: 3000,
+      max_tokens: 6000, // 항목별 배점·말투·커버리지까지 나와 길다. 잘리면 뒷부분(배점·다음 훈련)이 사라진다
       system: reportSys,
       messages: [{ role: 'user', content: JSON.stringify(log) }],
     })
     if (msg.stop_reason === 'refusal') throw new Error(`refusal:${msg.stop_details?.category ?? ''}`)
+    if (msg.stop_reason === 'max_tokens') console.warn('[report] output hit max_tokens')
     const text = msg.content.filter((b) => b.type === 'text').map((b) => b.text).join('')
-    return JSON.parse(extractJson(text))
+    const rep = await parseJsonWithRepair(text)
+    // 잘린 출력은 복구 과정에서 뒷부분이 사라진다. 필수 필드가 없으면 실패로 처리해 재시도(폴백 모델)로 넘긴다
+    if (typeof rep?.score !== 'number' || !rep?.headline || !Array.isArray(rep?.strengths) || !Array.isArray(rep?.improvements) || !rep?.nextTraining) {
+      throw new Error(`report incomplete (stop_reason=${msg.stop_reason}, keys=${Object.keys(rep ?? {}).join(',')})`)
+    }
+    return rep
   }
   try {
     return { report: await run(REPORT_MODEL), model: REPORT_MODEL }

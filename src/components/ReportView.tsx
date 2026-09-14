@@ -118,6 +118,19 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
               {report.speech && report.speech.length > 0 && <ul>{report.speech.map((t, i) => <li key={i}>{t}</li>)}</ul>}
             </section>
           )}
+          {report.coverage && report.coverage.length > 0 && (
+            <section className="coverage">
+              <h3>공고 요구사항 대비</h3>
+              <div className="coverage-list">
+                {report.coverage.map((c, i) => (
+                  <div key={i} className={`coverage-row ${c.status === '증명' ? 'ok' : c.status === '부분' ? 'partial' : 'miss'}`}>
+                    <span className="cov-status">{c.status}</span>
+                    <div><div className="cov-req">{c.requirement}</div><div className="muted small">{c.note}</div></div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
           <section>
             <h3>잘한 점</h3>
             <ul>{report.strengths.map((s, i) => <li key={i}>{s}</li>)}</ul>

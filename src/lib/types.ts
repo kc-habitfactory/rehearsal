@@ -19,6 +19,8 @@ export interface Scenario {
   opening: string // 첫 질문
   hiddenPlan: string // 면접관 내부 계획 (돌발 변수 포함)
   fields?: Record<string, string> // 준비 화면 입력값 (서버가 응답에 붙여 줌). 상대 프롬프트에 "상대가 알 법한 정보"로 쓰인다
+  resumeSummary?: string // 이력서 요약 (원문 대신 저장·전달)
+  jdRequirements?: string[] // 공고 요구사항 목록 (코치의 커버리지 평가용)
 }
 
 export interface Turn {
@@ -64,4 +66,5 @@ export interface Report {
   scoreBreakdown?: { item: string; max: number; score: number; note: string }[] // 항목별 배점
   speech?: string[] // 말투·전달 코멘트 (측정치 + 인용)
   speechProfile?: string // 이 상황이 선호하는 화법 한 줄
+  coverage?: { requirement: string; status: '증명' | '부분' | '미답'; note: string }[] // 공고 요구사항 대비 (공고를 넣은 면접만)
 }

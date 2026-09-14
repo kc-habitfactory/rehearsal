@@ -8,6 +8,8 @@ export interface ScenarioLike {
   opening?: string
   hiddenPlan: string
   fields?: Record<string, string> // 사용자가 준비 화면에서 입력한 값. 상대 프롬프트에서 "상대가 알 법한 정보"만 골라 쓴다
+  resumeSummary?: string // 면접: 이력서 요약 (원문 대신)
+  jdRequirements?: string[] // 면접: 공고 요구사항 목록
 }
 
 /** 상대 프롬프트용: 필드 중 상대가 알고 있어야 자연스러운 것만 골라 문장으로 만든다 */
