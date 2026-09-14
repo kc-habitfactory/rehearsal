@@ -1,6 +1,6 @@
 /* 도메인 프롬프트 공용: 타입, 상대가 아는 정보 헬퍼, 리포트 JSON 형식, 공통 대화 규칙 */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk'
 
 export interface ScenarioLike {
   title: string

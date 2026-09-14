@@ -193,6 +193,7 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .badge.hospital { background: rgba(0,206,201,.18); color: #00cec9; }
 .badge.immigration { background: rgba(116,185,255,.18); color: #74b9ff; }
 .badge.insurance_consult { background: rgba(253,121,168,.18); color: #fd79a8; }
+.badge.money_talk { background: rgba(85,239,196,.18); color: #55efc4; }
 .badge.real { background: rgba(232,234,240,.12); color: var(--text); border: 1px solid var(--line); margin-left: 6px; }
 
 /* 준비 화면: 실전 모드 토글 */

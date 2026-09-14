@@ -1,6 +1,6 @@
 /* 훈련 도메인 정의 (클라이언트). 서버의 server/domains.ts와 id를 맞춘다. */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk'
 
 export interface FieldDef {
   key: string
@@ -262,6 +262,33 @@ export const DOMAINS: DomainDef[] = [
       { topic: '숨은보험금 청구 가능하다고 앱에 떠서 문의', customer: '51세 자영업, 실손 2세대, 최근 입원 이력', level: '초급', career: '1년차' },
       { topic: '어린이보험·태아보험 신규 가입', customer: '33세 임신 7개월, 첫 아이', level: '중급', career: '신입' },
       { topic: '이 전화 사기 아니냐, 시그널플래너 사칭 뉴스 봤다', customer: '63세, 앱으로 숨은보험금 조회 후 상담 신청', level: '고급', career: '1년차' },
+    ],
+  },
+  {
+    id: 'money_talk',
+    name: '지인과 돈 이야기',
+    short: '돈 이야기',
+    description: '지인이 돈을 빌려달라고 할 때 관계를 지키며 거절하거나, 반대로 내가 예의 있게 부탁하는 연습. 상대는 급함·죄책감·금액 낮추기 같은 실제 압박 패턴을 쓰고, 셋 중 하나는 사정이 진짜인 정상 부탁이라 판단력도 함께 봅니다.',
+    counterpart: '지인',
+    startLabel: '대화 시작',
+    answerHint: '지인이 듣고 있습니다. 말씀하세요',
+    usesCamera: true,
+    fields: [
+      { key: 'side', label: '내 역할', placeholder: '거절하는 쪽 (지인이 빌려달라고 함) / 빌리는 쪽 (내가 부탁)' },
+      { key: 'relation', label: '관계', placeholder: '예: 5년 지기 친구 / 옆 팀 동료 / 사촌 형' },
+      { key: 'amount', label: '금액', placeholder: '예: 300만 원' },
+      { key: 'situation', label: '상황', placeholder: '예: 사업 급전, 다음 달 갚겠다고 함' },
+    ],
+    presets: [
+      { side: '거절하는 쪽 (지인이 빌려달라고 함)', relation: '5년 지기 친구', amount: '300만 원', situation: '사업 급전, 다음 달 월급으로 갚겠다고 함' },
+      { side: '거절하는 쪽 (지인이 빌려달라고 함)', relation: '옆 팀 동료', amount: '50만 원', situation: '월급 전까지만, 카드값 연체 직전' },
+      { side: '거절하는 쪽 (지인이 빌려달라고 함)', relation: '사촌 형', amount: '1,000만 원', situation: '전세 보증금 부족, 부모님께는 말하지 말아 달라 함' },
+      { side: '거절하는 쪽 (지인이 빌려달라고 함)', relation: '오랜만에 연락 온 고등학교 동창', amount: '200만 원', situation: '갑자기 연락해 급하다고만 함' },
+      { side: '거절하는 쪽 (지인이 빌려달라고 함)', relation: '친한 친구', amount: '150만 원', situation: '전에 빌려준 100만 원도 아직 안 갚은 상태에서 두 번째 부탁' },
+      { side: '거절하는 쪽 (지인이 빌려달라고 함)', relation: '전 연인', amount: '500만 원', situation: '헤어진 뒤 연락, 병원비라고 함' },
+      { side: '빌리는 쪽 (내가 부탁)', relation: '친한 친구', amount: '80만 원', situation: '병원비, 다음 달 25일 월급으로 갚을 계획' },
+      { side: '빌리는 쪽 (내가 부탁)', relation: '형(친형)', amount: '500만 원', situation: '이사 보증금 부족, 3개월 분할 상환 계획' },
+      { side: '빌리는 쪽 (내가 부탁)', relation: '대학 선배', amount: '200만 원', situation: '노트북 고장으로 급히 필요, 두 달 뒤 상환' },
     ],
   },
 ]

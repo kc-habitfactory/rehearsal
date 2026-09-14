@@ -76,6 +76,12 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['특약 나열로 시작', '"무조건·확정" 단정', '고객 질문에 침묵·"어…"', '2분을 넘기는 장황한 분석'],
     cpm: [280, 380], answerSec: [30, 120], latencySec: [0.5, 3],
   },
+  boundary: {
+    key: 'boundary', name: '거절·부탁형: 두 문장 안에 분명하게, 말투는 부드럽게',
+    likes: ['거절은 두 문장 안에, 개인 원칙으로("지인이랑 돈거래는 안 하기로 했어")', '부탁은 첫 문장에 금액·용도·상환일', '낮고 천천히, 사과 반복 없이', '거절 뒤 화제 전환 한 문장'],
+    dislikes: ['이유를 세 개 이상 나열', '"돈이 없어" 식 애매한 핑계', '상대 비난', '침묵으로 버티다 승낙', '사정만 길게'],
+    cpm: [250, 350], answerSec: [4, 25], latencySec: [0.8, 4],
+  },
   consultant: {
     key: 'consultant', name: '상담사형: 쉬운 말로 한 번에 하나씩, 단정하지 않고, 제안 뒤 침묵을 견디기',
     likes: ['고객 상황을 먼저 묻고 되짚기("~하신 거죠?")', '전문용어는 비유·예시로, 한 번에 한 가지', '"고객님 상황에서는 ~한 경우 유리합니다"처럼 조건부 표현', '핵심 제안 뒤 3~5초 침묵, 결정 재촉 금지', '거절에는 압박 대신 "한두 달 뒤 안부 겸 연락" 수준의 후속 약속'],
@@ -107,6 +113,7 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
     case 'immigration': return P.border
     case 'scam_call': return P.firm
     case 'insurance_consult': return P.consultant
+    case 'money_talk': return P.boundary
     default: return P.general
   }
 }

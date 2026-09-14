@@ -10,6 +10,7 @@ import { execQa } from './exec-qa'
 import { hospital } from './hospital'
 import { immigration } from './immigration'
 import { insuranceConsult } from './insurance-consult'
+import { moneyTalk } from './money-talk'
 
 export type { DomainId, DomainPrompts, ScenarioLike, NoteWhere } from './shared'
 export { knownFacts, TTS_INSTRUCTIONS_EN_DEFAULT } from './shared'
@@ -22,6 +23,7 @@ export const DOMAIN_PROMPTS: Record<DomainId, DomainPrompts> = {
   hospital,
   immigration,
   insurance_consult: insuranceConsult,
+  money_talk: moneyTalk,
 }
 
 export function getDomain(id: unknown): DomainPrompts {
