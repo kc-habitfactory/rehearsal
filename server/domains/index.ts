@@ -16,6 +16,8 @@ import { claimAppeal } from './claim-appeal'
 import { hiringInterviewer } from './hiring-interviewer'
 import { meetingPrep } from './meeting-prep'
 import { customerInterview } from './customer-interview'
+import { insurancePurchase } from './insurance-purchase'
+import { claimInquiry } from './claim-inquiry'
 
 export type { DomainId, DomainPrompts, ScenarioLike, NoteWhere } from './shared'
 export { knownFacts, TTS_INSTRUCTIONS_EN_DEFAULT } from './shared'
@@ -34,6 +36,8 @@ export const DOMAIN_PROMPTS: Record<DomainId, DomainPrompts> = {
   hiring_interviewer: hiringInterviewer,
   meeting_prep: meetingPrep,
   customer_interview: customerInterview,
+  insurance_purchase: insurancePurchase,
+  claim_inquiry: claimInquiry,
 }
 
 export function getDomain(id: unknown): DomainPrompts {

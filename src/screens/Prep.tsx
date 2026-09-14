@@ -160,6 +160,8 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
     insurance_consult: ['신청서 뒤에 숨은 고객 사정을 정하는 중', '고객 성향 여섯 축을 정하는 중', '2026 제도 사실을 맞추는 중', '돌발 변수를 심는 중', '전화 받는 첫 말을 다듬는 중'],
     money_talk: ['지인의 진짜 사정을 정하는 중', '압박형인지 정상 부탁인지 정하는 중', '압박 전술 순서를 짜는 중', '관계에 맞는 말투를 정하는 중', '첫 말을 다듬는 중'],
     parent_teacher: ['담임의 관찰 사실을 정하는 중', '안내할 절차를 맞추는 중', '담임 성향을 정하는 중', '돌발 변수를 심는 중', '첫 인사를 다듬는 중'],
+    claim_inquiry: ['실제 보장 여부와 이유를 정하는 중', '상담원 유형을 정하는 중', '필요 서류와 절차를 맞추는 중', '돌발 변수를 심는 중', '콜센터 첫 인사를 다듬는 중'],
+    insurance_purchase: ['설계사 유형을 정하는 중', '추천 상품의 적합성을 정하는 중', '먼저 말하지 않을 정보를 고르는 중', '밀어붙임 전술 순서를 짜는 중', '첫 인사를 다듬는 중'],
     claim_appeal: ['부지급이 정당한지 애매한지 정하는 중', '약관 근거와 인정 범위를 정하는 중', '담당자 전술 순서를 짜는 중', '돌발 변수를 심는 중', '콜센터 첫 인사를 다듬는 중'],
     hiring_interviewer: ['지원자 유형을 정하는 중', '이력서에 과장 항목을 심는 중', '질문 유형별 반응 규칙을 짜는 중', '역질문을 준비하는 중', '첫 인사를 다듬는 중'],
     meeting_prep: ['문서에서 결정 사항·미확인 항목을 뽑는 중', '내 역할이 걸린 대표 질문 하나를 고르는 중', '정답 요지와 판정 기준을 적는 중', '되묻기 규칙을 정하는 중', '첫 말을 다듬는 중'],
@@ -168,7 +170,7 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
   const stageMsgs = STAGES[dom.id] ?? STAGES.interview
   const timedMsg = stageMsgs[Math.min(stageMsgs.length - 1, Math.floor(scenarioElapsed / 4))]
   const stageMsg = serverStage === 'pool_hit' ? '미리 만들어 둔 시나리오를 꺼내는 중' : serverStage === 'generating' ? `AI가 새 시나리오를 만드는 중 · ${timedMsg}` : timedMsg
-  const expected = dom.id === 'scam_call' || dom.id === 'insurance_consult' || dom.id === 'claim_appeal' || dom.id === 'meeting_prep' ? '보통 15~25초' : '보통 8~15초'
+  const expected = dom.id === 'scam_call' || dom.id === 'insurance_consult' || dom.id === 'claim_appeal' || dom.id === 'claim_inquiry' || dom.id === 'insurance_purchase' || dom.id === 'meeting_prep' ? '보통 15~25초' : '보통 8~15초'
   // 판별 훈련 도메인은 제목이 답을 드러내므로 시작 전에는 숨긴다
   const scenarioLabel = scenario
     ? dom.hideTitleBeforeStart ? `시나리오 준비 완료 · 내용은 ${dom.startLabel} 후 확인하세요` : `시나리오 · ${scenario.title}`

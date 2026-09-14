@@ -94,6 +94,18 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['"왜 안 주냐" 반복', '감정·인격 공격', '의료자문에 그냥 동의', '제도를 틀리게 말함', '기한·번호 없이 "검토해 주세요"로 끝'],
     cpm: [260, 360], answerSec: [6, 35], latencySec: [0.5, 3],
   },
+  buyer: {
+    key: 'buyer', name: '가입 상담 고객형: 장점 설명은 듣되 제외·비용·환급을 반드시 되묻고, 결정은 서면 검토 뒤에',
+    likes: ['"보장 안 되는 게 뭔가요"처럼 제외부터 묻기', '갱신·총 납입액·해지환급금을 숫자로 확인', '"설계서 서면으로 주시면 검토 후 연락드릴게요"로 즉답 미루기', '고지는 청약서에 직접 적겠다고 말하기', '정중하고 차분, 설계사 말을 끝까지 듣고 되짚기'],
+    dislikes: ['"그럼 그걸로 할게요" 즉석 결정', '보험료 월액만 듣고 만족', '설계사의 고지 생략 유도에 동의', '기존 보험 해지에 비교 없이 동의', '설계사를 근거 없이 적대'],
+    cpm: [260, 360], answerSec: [5, 30], latencySec: [0.5, 3],
+  },
+  inquirer: {
+    key: 'inquirer', name: '청구 문의형: 사실을 한 줄로 먼저, 질문은 항목→조건→서류→방법→기간 순서로, 떨려도 천천히',
+    likes: ['첫 문장에 무슨 일·진단·치료·내 보험', '"어느 항목으로 청구하면 되나요" 같은 구체 질문', '"안 되는 경우는 어떤 경우인가요" 확인', '서류 문구(코드·세부내역서)와 청구 방법·기간 확인', '끊기 전 접수번호·상담원 이름'],
+    dislikes: ['"다쳤는데 돼요?"만 반복', '"심사 결과에 따라"를 최종 답으로 받아들임', '필러·되묻기 과다, 상담원 말 끊기', '서류·기한 안 묻고 종료', '상담원 몰아붙이기'],
+    cpm: [240, 340], answerSec: [5, 30], latencySec: [0.5, 3.5],
+  },
   interviewer: {
     key: 'interviewer', name: '면접관형: 질문은 한 번에 하나·두 문장, 듣는 시간이 말하는 시간의 두 배',
     likes: ['"이력서에 쓰신 ○○" 인용으로 시작', '경험 질문 → 꼬리질문(왜·대안·기여·수치)', '중립적이고 차분한 톤, 끝까지 듣고 되짚기', '오프닝에 흐름·시간, 클로징에 다음 단계'],
@@ -146,6 +158,8 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
     case 'money_talk': return P.boundary
     case 'parent_teacher': return P.parent
     case 'claim_appeal': return P.claimant
+    case 'insurance_purchase': return P.buyer
+    case 'claim_inquiry': return P.inquirer
     case 'hiring_interviewer': return P.interviewer
     case 'meeting_prep': return P.briefing
     case 'customer_interview': return P.researcher
