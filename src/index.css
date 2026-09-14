@@ -477,6 +477,8 @@ input.pw { font: inherit; color: var(--text); background: var(--panel); border: 
 .field:focus-within { border-color: var(--accent); }
 .field input { font: inherit; font-size: 15px; color: var(--text); background: transparent; border: none; padding: 0; outline: none; width: 100%; }
 .field input::placeholder { color: var(--muted); opacity: .6; }
+.random-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--text); background: var(--accent-soft); border: 1px solid rgba(59,125,255,.5); white-space: nowrap; }
+.random-btn:hover { background: rgba(59,125,255,.28); border-color: var(--accent); }
 .pick-card { position: relative; overflow: hidden; display: flex; gap: 16px; align-items: stretch; padding: 20px 22px; border-radius: 16px; border: 1px solid rgba(59,125,255,.45); background: linear-gradient(135deg, rgba(59,125,255,.14), rgba(59,125,255,.04) 60%, transparent); }
 .pick-card::after { content: ''; position: absolute; right: -60px; bottom: -80px; width: 280px; height: 200px; border-radius: 50%; background: radial-gradient(closest-side, rgba(59,125,255,.22), transparent); pointer-events: none; }
 .pick-body { flex: 1; min-width: 0; display: grid; gap: 10px; align-content: start; }

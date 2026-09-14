@@ -91,7 +91,7 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
   const pos = presetIdx !== null ? presetOrder.indexOf(presetIdx) : -1
   const step = (d: 1 | -1) => applyPreset(presetOrder[(pos < 0 ? (d > 0 ? 0 : presetOrder.length - 1) : (pos + d + presetOrder.length) % presetOrder.length)])
   const activePreset = presetIdx !== null && chipActive(presetIdx) ? dom.presets[presetIdx] : null
-  const tagLabel = activePreset ? (isInternal(activePreset) ? '★ 사내 케이스' : '예시') : '내 설정'
+  const tagLabel = activePreset ? (isInternal(activePreset) ? '★ 추천 케이스' : '예시') : '내 설정'
   const start = () => onNext({ domain: domainId, fields: { ...fields, name: getNickname() ?? '' } })
 
   return (
@@ -122,16 +122,12 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
         </header>
 
         <div className="fields">
-          {shortFields.map((f) => {
-            const options = [...new Set(dom.presets.map((p) => (p[f.key] ?? '').trim()).filter(Boolean))]
-            return (
-              <label key={f.key} className="field">
-                <span>{f.label}</span>
-                <input list={`opt-${f.key}`} value={fields[f.key] ?? ''} onChange={set(f.key)} placeholder={f.placeholder} />
-                <datalist id={`opt-${f.key}`}>{options.map((o) => <option key={o} value={o} />)}</datalist>
-              </label>
-            )
-          })}
+          {shortFields.map((f) => (
+            <label key={f.key} className="field">
+              <span>{f.label}</span>
+              <input value={fields[f.key] ?? ''} onChange={set(f.key)} placeholder={f.placeholder} />
+            </label>
+          ))}
         </div>
 
         <section className="pick-card">
@@ -160,13 +156,13 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
 
         <section className="presets">
           <div className="presets-head">
-            <span className="presets-title"><span className="star" aria-hidden>★</span> 예시로 채워보기 <span className="muted">· {dom.presets.length}개</span>{dom.presets.some(isInternal) && <span className="mini-badge">★ 사내 케이스</span>}</span>
-            <button type="button" className="ghost small" onClick={random} title="예시 중 하나를 무작위로 채웁니다"><span aria-hidden>🎲</span> 랜덤</button>
+            <span className="presets-title"><span className="star" aria-hidden>★</span> 예시로 채워보기 <span className="muted">· {dom.presets.length}개</span>{dom.presets.some(isInternal) && <span className="mini-badge">★ 추천 케이스</span>}</span>
+            <button type="button" className="random-btn" onClick={random} title="예시 중 하나를 무작위로 채웁니다"><span aria-hidden>🎲</span> 랜덤 예시</button>
           </div>
           <div className="chips">
             {presetOrder.map((i) => { const p = dom.presets[i]; const l = chipLabel(p); return (
               <button key={i} type="button" className={`chip ${chipActive(i) ? 'active' : ''} ${isInternal(p) ? 'internal' : ''}`} onClick={() => applyPreset(i)} title={dom.fields.map((f) => `${f.label.replace(/\s*\(.*$/, '')}: ${p[f.key] ?? ''}`).join('\n')}>
-                {isInternal(p) && <span className="star" aria-label="사내 케이스">★</span>}
+                {isInternal(p) && <span className="star" aria-label="추천 케이스">★</span>}
                 <span className="chip-main">{l.main}</span>
                 {l.sub && <span className="chip-sub">{l.sub}</span>}
               </button>
