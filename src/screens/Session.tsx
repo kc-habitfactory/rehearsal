@@ -7,6 +7,7 @@ import type { NonverbalSummary, Scenario, SessionLog, SetupInput, Turn } from '.
 import { domainById } from '../lib/domains'
 import { loadTtsPref } from '../lib/prefs'
 import { clearInflight, saveInflight, type Inflight } from '../lib/inflight'
+import { playRing, type Ring } from '../lib/ring'
 import { subscribe } from '../lib/ws'
 import { getUserKey } from '../lib/user'
 
@@ -33,6 +34,9 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
   const [textMode, setTextMode] = useState(resume ? (resume.textMode || !speechSupported()) : (!hasMic || !speechSupported()))
   const [draft, setDraft] = useState('')
   const [resumed] = useState(Boolean(resume))
+  const isPhone = !dom.usesCamera && dom.callMode !== 'desk' // 전화 상황: 첫 대사 전에 신호음
+  const [ringing, setRinging] = useState(false)
+  const ringRef = useRef<Ring | null>(null)
 
   const [live, setLive] = useState<LiveState | null>(null)
   const [phase, setPhaseState] = useState<Phase>('interviewer')
@@ -182,19 +186,29 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
           startRef.current = performance.now() // 타이머는 상대가 입을 여는 순간부터
           sp!.speak(scenario.opening)
         }
+        // 전화 상황: 발신음(내가 걺) 또는 착신음(걸려옴)이 두 번 울린 뒤 상대가 말한다. Space·말 끊기로 바로 받을 수 있다
+        const ringThen = (next: () => void) => {
+          if (!isPhone) return next()
+          setRinging(true)
+          phaseLabelRef.current = dom.callDirection === 'in' ? '전화 오는 중' : '전화 거는 중'
+          const r = playRing(dom.callDirection === 'in' ? 'in' : 'out')
+          ringRef.current = r
+          void r.done.then(() => { ringRef.current = null; setRinging(false); next() })
+        }
         if (setup.realMode) {
           // 자세를 잡을 시간. 3, 2, 1 뒤 상대가 말을 시작한다
           let n = 3
           setCountdown(n)
           countdownIv = window.setInterval(() => {
             n -= 1
-            if (n <= 0) { window.clearInterval(countdownIv!); countdownIv = null; setCountdown(null); begin() } else setCountdown(n)
+            if (n <= 0) { window.clearInterval(countdownIv!); countdownIv = null; setCountdown(null); ringThen(begin) } else setCountdown(n)
           }, 1000)
-        } else begin()
+        } else ringThen(begin)
       })
     return () => {
       cancelled = true
       if (countdownIv) window.clearInterval(countdownIv)
+      ringRef.current?.stop()
       sp?.cancel()
       stopListenRef.current?.()
       abortRef.current?.abort()
@@ -335,6 +349,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
   /** 상대가 말하는 도중 끼어든다. 재생을 멈추고, 스트리밍 중이면 지금까지 말한 부분만 기록한 뒤 바로 듣는다 */
   function interrupt() {
     if (finishedRef.current) return
+    if (ringRef.current) { ringRef.current.stop(); return } // 신호음 중이면 바로 받는다
     abortRef.current?.abort()
     speakerRef.current?.interrupt()
     const pending = pendingRef.current
@@ -425,12 +440,12 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
       <div className="session-main">
         {!dom.usesCamera ? (
           <div className="call-screen">
-            <div className={`call-avatar ${phase === 'interviewer' ? 'talking' : ''}`}>{scenario.interviewer.name[0]}</div>
+            <div className={`call-avatar ${ringing ? 'ringing' : phase === 'interviewer' ? 'talking' : ''}`}>{scenario.interviewer.name[0]}</div>
             <div className="call-name">{scenario.interviewer.name}</div>
             <div className="call-status">
-              {phase === 'done' ? `${dom.callLabel ?? '통화'} 종료` : `${dom.callLabel ?? '통화'} 중 ${mm}:${ss}`}
+              {ringing ? (dom.callDirection === 'in' ? '전화 오는 중…' : '전화 거는 중…') : phase === 'done' ? `${dom.callLabel ?? '통화'} 종료` : `${dom.callLabel ?? '통화'} 중 ${mm}:${ss}`}
             </div>
-            <div className="call-wave">{phase === 'interviewer' ? '상대가 말하는 중' : phase === 'listening' ? (textMode ? '답변 입력 대기' : '내 차례') : phase === 'thinking' ? '…' : ''}</div>
+            <div className="call-wave">{ringing ? (dom.callDirection === 'in' ? '벨이 울립니다 · Space로 바로 받기' : '연결 중 · Space로 바로 넘기기') : phase === 'interviewer' ? '상대가 말하는 중' : phase === 'listening' ? (textMode ? '답변 입력 대기' : '내 차례') : phase === 'thinking' ? '…' : ''}</div>
             {realOverlays}
           </div>
         ) : (
@@ -453,7 +468,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
               <div className="who-role muted small">{scenario.interviewer.name.startsWith(dom.counterpart) ? scenario.interviewer.style : dom.counterpart}</div>
             </div>
             <span className={`status ${phase}`}>
-              {phase === 'interviewer' && '말하는 중'}
+              {phase === 'interviewer' && (ringing ? (dom.callDirection === 'in' ? '전화 오는 중' : '연결 중') : '말하는 중')}
               {phase === 'listening' && '내 차례'}
               {phase === 'thinking' && '생각 중'}
               {phase === 'done' && '종료'}
@@ -491,7 +506,8 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
           {error && <p className="error small">{error}</p>}
 
           <div className="actions">
-            {phase === 'interviewer' && <button className="main-action outline" onClick={interrupt} title="상대 말을 끊고 바로 답합니다">말 끊고 답하기 <kbd>Space</kbd></button>}
+            {phase === 'interviewer' && ringing && <button className="main-action primary" onClick={interrupt}>{dom.callDirection === 'in' ? '전화 받기' : '바로 연결'} <kbd>Space</kbd></button>}
+            {phase === 'interviewer' && !ringing && <button className="main-action outline" onClick={interrupt} title="상대 말을 끊고 바로 답합니다">말 끊고 답하기 <kbd>Space</kbd></button>}
             {phase === 'listening' && !textMode && <button className="main-action primary" onClick={() => stopListenRef.current?.()}>답변 끝 <kbd>Space</kbd></button>}
             {phase === 'listening' && textMode && <button className="main-action primary" onClick={submitDraft} disabled={!draft.trim()}>보내기 <kbd>Enter</kbd></button>}
             {phase === 'thinking' && <button className="main-action outline" disabled>상대가 생각하는 중…</button>}

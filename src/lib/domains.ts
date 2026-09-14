@@ -21,6 +21,7 @@ export interface DomainDef {
   lang?: 'ko' | 'en' // 대화 언어. 음성 인식·합성에 반영. 기본 ko
   hideTitleBeforeStart?: boolean // 준비 화면에서 제목을 숨김 (판별 훈련)
   callMode?: 'phone' | 'desk' // usesCamera false 일 때 화면 종류: 전화(기본) 또는 대면·책상
+  callDirection?: 'in' | 'out' // 전화 상황의 방향: out = 내가 건다(발신음 뒤 상대가 받음, 기본), in = 걸려온다(착신음 뒤 시작). desk 상황은 신호음 없음
   callLabel?: string // usesCamera false 일 때 상태 표기 명사: '통화'(기본) / '점검' / '면담' 등 → "○○ 중 00:12", "○○ 종료"
   fields: FieldDef[]
   presets: Record<string, string>[]
@@ -98,6 +99,7 @@ export const DOMAINS: DomainDef[] = [
     description: '보험 설계사가 새 보험을 권하는 전화를 받습니다. 보장 범위와 제외, 면책·감액 기간, 갱신형 보험료와 총 납입액, 무·저해지 환급금 구조, 고지의무, 2026년 판매수수료 등급, 갈아타기(승환) 유도까지 물어야 할 것을 물고, 밀어붙임에 즉답을 미루는 연습. 설계사 유형(정석·밀어붙임·승환 유도·정보 과다)은 AI가 정합니다. 카메라 없음.',
     counterpart: '보험 설계사',
     startLabel: '상담 전화 받기',
+    callDirection: 'in',
     answerHint: '설계사가 듣고 있습니다. 말씀하세요',
     usesCamera: false,
     fields: [
@@ -377,6 +379,7 @@ export const DOMAINS: DomainDef[] = [
     description: '2024~2026 실제 사례를 기반으로 사기범(또는 진짜 기관)의 전화를 받아 의심하고, 정보를 지키고, 끊는 연습. 진짜 전화가 섞여 나옵니다.',
     counterpart: '발신자',
     startLabel: '전화 받기',
+    callDirection: 'in',
     answerHint: '통화 중입니다. 말씀하세요',
     usesCamera: false,
     hideTitleBeforeStart: true,
@@ -408,6 +411,7 @@ export const DOMAINS: DomainDef[] = [
     counterpart: '지인',
     startLabel: '대화 시작',
     usesCamera: false,
+    callDirection: 'in',
     callLabel: '대화',
     answerHint: '지인이 듣고 있습니다. 말씀하세요',
     fields: [

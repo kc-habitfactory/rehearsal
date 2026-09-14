@@ -535,3 +535,7 @@ input.pw { font: inherit; color: var(--text); background: var(--panel); border: 
   .doc-actions { width: 100%; justify-content: flex-start; }
 }
 @media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
+
+/* 전화 신호음 중 아바타 흔들림 */
+.call-avatar.ringing { animation: ringshake .5s ease-in-out infinite; }
+@keyframes ringshake { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-6deg); } 40% { transform: rotate(6deg); } 60% { transform: rotate(-4deg); } 80% { transform: rotate(4deg); } }
