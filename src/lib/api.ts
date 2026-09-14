@@ -76,7 +76,7 @@ export interface Me {
   streak: number
   stats: { total: number; recentAvg: number | null; recentDelta: number | null; recentCount: number }
   next: { id: number; scheduled_at: string } | null
-  recent: { id: number; domain?: string; title: string; score: number | null; eye_contact: number; duration_ms: number; report_status?: 'pending' | 'done' | 'failed'; created_at: string; real_mode?: boolean | number | null }[]
+  recent: { id: number; domain?: string; title: string; score: number | null; eye_contact: number; duration_ms: number; report_status?: 'pending' | 'done' | 'failed'; created_at: string; real_mode?: boolean | number | null; user_turns?: number | null }[]
 }
 
 export async function fetchMe(nickname?: string | null): Promise<Me> {

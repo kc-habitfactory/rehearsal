@@ -1,3 +1,4 @@
+import { scoreBand } from '../lib/score'
 import { useEffect, useState } from 'react'
 import { Gauge, Pill } from '../components/Gauge'
 import { spectate, type PushMessage } from '../lib/ws'
@@ -100,7 +101,7 @@ export function Spectator({ userKey }: { userKey: string }) {
         <div className="spectator-result">
           {reportState === 'done' && result ? (
             <>
-              <div className="score-wrap"><div className="score">{result.score}</div><div className="score-unit">종합 점수 / 100</div></div>
+              <div className="score-wrap"><div className={`score score-${scoreBand(result.score)}`}>{result.score}</div><div className="score-unit">종합 점수 / 100</div></div>
               <div className="headline">{result.headline}</div>
             </>
           ) : reportState === 'failed' ? (

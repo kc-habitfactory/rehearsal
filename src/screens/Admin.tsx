@@ -1,3 +1,4 @@
+import { scoreBand, scoreDisplay } from '../lib/score'
 import { useEffect, useState } from 'react'
 import { subscribeAdmin, type LiveEntry } from '../lib/ws'
 import { domainById, type DomainId } from '../lib/domains'
@@ -9,7 +10,7 @@ import { History } from './History'
 
 const TOKEN_KEY = 'rehearsal.adminToken'
 
-interface PastRow { id: number; user_key: string; nickname?: string | null; domain: string; title: string; score: number | null; report_status: string; created_at: string; duration_ms: number; real_mode?: boolean | number | null }
+interface PastRow { id: number; user_key: string; nickname?: string | null; domain: string; title: string; score: number | null; report_status: string; created_at: string; duration_ms: number; real_mode?: boolean | number | null; user_turns?: number | null }
 
 export function Admin() {
   const [token, setToken] = useState<string | null>(() => { try { return localStorage.getItem(TOKEN_KEY) } catch { return null } })
@@ -159,7 +160,7 @@ export function Admin() {
                   {badge(e.domain)}
                   <span className="title">{e.name ? <b>{e.name}</b> : null}{e.name ? ' · ' : ''}{e.title ?? '-'}</span>
                   <span className="muted small">{e.endedAt ? ago(e.endedAt) : ''}</span>
-                  <span className="score">{e.left ? '중단(나감)' : e.reportStatus === 'done' ? `${e.score}점` : e.reportStatus === 'failed' ? '실패' : '리포트 작성 중'}</span>
+                  <span className={`score ${e.left ? 'score-abort' : e.reportStatus === 'done' && typeof e.score === 'number' ? `score-${scoreBand(e.score)}` : 'score-none'}`}>{e.left ? '중단(나감)' : e.reportStatus === 'done' ? `${e.score}점` : e.reportStatus === 'failed' ? '실패' : '리포트 작성 중'}</span>
                 </>
               )
               // 세션이 저장되면 sessionId가 채워지고, 그때부터 클릭해 리포트(작성 중이면 진행 화면)를 볼 수 있다
@@ -181,7 +182,7 @@ export function Admin() {
             <span className="title">{r.real_mode ? <span className="badge real">실전</span> : null}{r.title}</span>
             <span className="muted small">{new Date(r.created_at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
             <span className="muted small key">{r.nickname ? <b>{r.nickname}</b> : `${r.user_key.slice(0, 10)}…`}</span>
-            <span className="score">{r.report_status === 'pending' ? '생성 중' : r.score !== null ? `${r.score}점` : '–'}</span>
+            {(() => { const d = scoreDisplay(r.score, r.report_status, r.user_turns); return <span className={`score ${d.cls}`}>{d.text}{d.unit ? '점' : ''}</span> })()}
           </button>
         ))}
         {past.length < pastTotal && (

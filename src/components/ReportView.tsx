@@ -1,3 +1,4 @@
+import { scoreBand } from '../lib/score'
 import type { NonverbalEvent, NonverbalSummary, Report, Turn } from '../lib/types'
 import { summarizeSpeech, fmtLatency, fmtCpm } from '../lib/speech-metrics'
 
@@ -84,7 +85,7 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
           )}
           <div className={`score-card ${report.scoreBreakdown?.length ? 'with-breakdown' : ''}`}>
             <div className="score-wrap">
-              <div className="score">{report.score}</div>
+              <div className={`score score-${scoreBand(report.score)}`}>{report.score}</div>
               <div className="score-unit">종합 점수 / 100</div>
             </div>
             <div className="headline">{report.headline}</div>

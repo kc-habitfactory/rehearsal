@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { cancelReservation, fetchMe, fetchSessions, type Me, type SessionListItem } from '../lib/api'
+import { scoreDisplay } from '../lib/score'
 import { getNickname, setNickname } from '../lib/user'
 import { domainById, type DomainId } from '../lib/domains'
 import { subscribe } from '../lib/ws'
@@ -185,7 +186,7 @@ export function Home({ onStart, onOpenHistory }: { onStart: () => void; onOpenHi
             <button key={s.id} className="recent-row" onClick={() => onOpenHistory(s.id)}>
               <span className="title"><span className={`badge ${s.domain ?? 'interview'}`}>{domainById((s.domain ?? 'interview') as DomainId).short}</span>{s.real_mode ? <span className="badge real" title="실전 모드로 훈련">실전</span> : null}{s.title}</span>
               <span className="muted small">{new Date(s.created_at).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })}</span>
-              <span className="recent-score">{s.report_status === 'pending' ? '생성 중' : s.score !== null ? <>{s.score}<span className="unit">점</span></> : '–'}</span>
+              {(() => { const d = scoreDisplay(s.score, s.report_status, s.user_turns); return <span className={`recent-score ${d.cls}`}>{d.text}{d.unit && <span className="unit">점</span>}</span> })()}
             </button>
           ))}
           {recent.length < total && (
