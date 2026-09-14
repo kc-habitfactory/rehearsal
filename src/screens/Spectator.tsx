@@ -17,6 +17,9 @@ export function Spectator({ userKey }: { userKey: string }) {
   const [elapsed, setElapsed] = useState(0)
   const [lastAt, setLastAt] = useState<number>(0)
   const [ended, setEnded] = useState(false)
+  const [left, setLeft] = useState(false) // 훈련자가 종료 없이 나감
+  const [current, setCurrent] = useState('') // 상대가 지금 말하는 문장 (아직 기록 전)
+  const [interim, setInterim] = useState('') // 훈련자가 말하는 중 (음성 인식 중간 결과)
   const [reportState, setReportState] = useState<'none' | 'writing' | 'done' | 'failed'>('none')
   const [result, setResult] = useState<{ score: number; headline: string } | null>(null)
   const [, tick] = useState(0)
@@ -41,11 +44,15 @@ export function Spectator({ userKey }: { userKey: string }) {
       setLastAt(m.at)
       if (m.ended) {
         setEnded(true)
-        setPhase('훈련 종료')
+        setPhase(m.left ? '훈련자 이탈' : '훈련 종료')
+        if (m.left) setLeft(true)
+        setCurrent(''); setInterim('')
       } else if (ended) {
         // 새 훈련이 시작되면 초기화
-        setEnded(false); setResult(null); setReportState('none'); setTurns([])
+        setEnded(false); setLeft(false); setResult(null); setReportState('none'); setTurns([]); setCurrent(''); setInterim('')
       }
+      if (typeof m.current === 'string') setCurrent(m.current)
+      if (typeof m.interim === 'string') setInterim(m.interim)
       if (m.metrics) setMetrics(m.metrics as Record<string, number>)
       if (m.phase) setPhase(m.phase)
       if (m.title) setTitle(m.title)
@@ -62,8 +69,12 @@ export function Spectator({ userKey }: { userKey: string }) {
   }, [userKey])
 
   const stale = !ended && lastAt > 0 && Date.now() - lastAt > 15_000
-  const mm = String(Math.floor(elapsed / 60000)).padStart(2, '0')
-  const ss = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0')
+  // 시계는 신호 사이를 로컬로 보간해 매초 움직인다 (신호가 끊기면 멈춤)
+  const shown = ended || stale || !lastAt ? elapsed : elapsed + (Date.now() - lastAt)
+  const mm = String(Math.floor(shown / 60000)).padStart(2, '0')
+  const ss = String(Math.floor((shown % 60000) / 1000)).padStart(2, '0')
+  const lastTurn = turns[turns.length - 1]
+  const showCurrent = !ended && current && !(lastTurn?.role === 'interviewer' && lastTurn.text.replace(/…$/, '') === current.replace(/…$/, ''))
   const eye = metrics?.eyeContactPct
 
   return (
@@ -77,8 +88,13 @@ export function Spectator({ userKey }: { userKey: string }) {
       </div>
 
       {!lastAt && <p className="muted">훈련이 시작되면 여기에 실시간 지표와 대화가 표시됩니다.</p>}
-      {stale && <p className="error small">15초 이상 신호가 없습니다. 연결이 끊겼을 수 있습니다.</p>}
-      {ended && (
+      {stale && <p className="error small">15초 이상 신호가 없습니다. 훈련자의 연결이 끊겼거나 탭이 백그라운드로 갔을 수 있습니다.</p>}
+      {ended && left && (
+        <div className="spectator-result">
+          <div className="muted">훈련자가 종료 버튼 없이 화면을 나갔습니다. 이 훈련은 저장되지 않았습니다.</div>
+        </div>
+      )}
+      {ended && !left && (
         <div className="spectator-result">
           {reportState === 'done' && result ? (
             <>
@@ -121,6 +137,12 @@ export function Spectator({ userKey }: { userKey: string }) {
               <span className="who">{t.role === 'user' ? '훈련자' : counterpart}</span> {t.text}
             </div>
           ))}
+          {showCurrent && (
+            <div className="line interviewer live"><span className="who">{counterpart}</span> {current}<span className="cursor">▍</span></div>
+          )}
+          {!ended && interim && (
+            <div className="line user live"><span className="who">훈련자</span> {interim}<span className="cursor">▍</span></div>
+          )}
         </div>
       </div>
     </div>

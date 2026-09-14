@@ -3,7 +3,7 @@ import { getUserKey } from './user'
 
 export type PushMessage =
   | { type: 'scenario_progress'; stage: 'pool_hit' | 'generating' | 'done' | 'pool_refilled' | 'failed'; domain: string }
-  | { type: 'live_update'; from: string; at: number; metrics?: Record<string, unknown>; turn?: unknown; turns?: unknown[]; phase?: string; title?: string; counterpart?: string; elapsedMs?: number; ended?: boolean; name?: string }
+  | { type: 'live_update'; from: string; at: number; metrics?: Record<string, unknown>; turn?: unknown; turns?: unknown[]; phase?: string; title?: string; counterpart?: string; elapsedMs?: number; ended?: boolean; left?: boolean; name?: string; current?: string; interim?: string }
   | { type: 'hello'; serverTime: number }
   | { type: 'pong' }
   | { type: 'admin_update'; entries: LiveEntry[] }
@@ -30,6 +30,7 @@ export interface LiveEntry {
   reportStatus?: 'writing' | 'done' | 'failed'
   sessionId?: number
   name?: string
+  left?: boolean
 }
 
 type Listener = (m: PushMessage) => void

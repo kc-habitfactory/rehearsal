@@ -44,9 +44,13 @@ export function Home({ onStart, onOpenHistory }: { onStart: () => void; onOpenHi
   const [name, setName] = useState<string>(() => getNickname() ?? '')
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
+  const [nameError, setNameError] = useState<string | null>(null)
   const saveName = () => {
     const n = nameDraft.trim().slice(0, 20)
     if (!n) return
+    // 안내문(placeholder)을 그대로 적은 경우: 상대가 "이름이나 별명 님"이라고 부르게 된다
+    if (/이름이나 별명|예\s*:/.test(n)) { setNameError('실제 이름이나 부르고 싶은 별명을 적어 주세요.'); return }
+    setNameError(null)
     setNickname(n)
     setName(n)
     setEditingName(false)
@@ -123,7 +127,7 @@ export function Home({ onStart, onOpenHistory }: { onStart: () => void; onOpenHi
             <button className="primary" type="submit" disabled={!nameDraft.trim()}>저장</button>
             {name && <button type="button" className="ghost" onClick={() => setEditingName(false)}>취소</button>}
           </div>
-          <p className="muted small">{name ? '상대가 부르는 이름이 바뀝니다.' : '면접관·인사담당자·의사가 이 이름으로 부릅니다. 가입 없이 이 브라우저에만 저장돼요.'}</p>
+          <p className={nameError ? 'error small' : 'muted small'}>{nameError ?? (name ? '상대가 부르는 이름이 바뀝니다.' : '면접관·인사담당자·의사가 이 이름으로 부릅니다. 가입 없이 이 브라우저에만 저장돼요.')}</p>
         </form>
       ) : (
         <p className="greeting">

@@ -34,6 +34,7 @@ export interface LiveEntry {
   reportStatus?: 'writing' | 'done' | 'failed'
   sessionId?: number // 저장된 세션 id (리포트 큐잉 이후 채워짐) — 관리자 화면에서 클릭해 리포트를 본다
   name?: string // 훈련자 이름 (홈에서 입력). 관리자·관전 화면 표시용
+  left?: boolean // 훈련자가 종료 버튼 없이 탭을 닫거나 나감 (pagehide 신호). 저장되지 않은 훈련
 }
 const liveEntries = new Map<string, LiveEntry>()
 const admins = new Set<WebSocket>()
@@ -57,7 +58,8 @@ function touchLive(userKey: string, data: Record<string, unknown>) {
   if (typeof data.phase === 'string') e.phase = data.phase
   if (typeof data.elapsedMs === 'number') e.elapsedMs = data.elapsedMs
   if (data.metrics && typeof data.metrics === 'object') e.metrics = data.metrics as Record<string, unknown>
-  if (data.ended === true) { e.ended = true; e.endedAt = now; e.reportStatus = e.reportStatus ?? 'writing' }
+  if (data.left === true) { e.left = true; e.ended = true; e.endedAt = now; e.reportStatus = e.reportStatus ?? 'failed' }
+  else if (data.ended === true) { e.ended = true; e.endedAt = now; e.reportStatus = e.reportStatus ?? 'writing' }
   e.lastAt = now
   liveEntries.set(userKey, e)
   scheduleAdminBroadcast()
@@ -93,6 +95,18 @@ export function setLiveHandler(fn: (userKey: string, data: Record<string, unknow
   onLive = fn
 }
 
+/** 세션 진행 신호 처리: Redis 저장(onLive) + 레지스트리 갱신 + 관전자 중계. WS 'live'와 HTTP /api/live(탭 닫힘 beacon)가 같이 쓴다 */
+export function handleLive(userKey: string, data: Record<string, unknown>) {
+  onLive?.(userKey, data)
+  touchLive(userKey, data)
+  const out: PushMessage = { type: 'live_update', from: userKey, at: Date.now(), ...(data as object) }
+  const set = spectators.get(userKey)
+  if (set) {
+    const payload = JSON.stringify(out)
+    for (const w of set) if (w.readyState === WebSocket.OPEN) w.send(payload)
+  }
+}
+
 export function initRealtime(server: Server) {
   const wss = new WebSocketServer({ server, path: '/ws' })
   wss.on('connection', (ws) => {
@@ -123,17 +137,9 @@ export function initRealtime(server: Server) {
             ws.send(JSON.stringify({ type: 'admin_denied' } satisfies PushMessage))
           }
         } else if (msg.type === 'live' && userKey) {
-          // 세션 진행 중 지표·대사·상태. Redis에 저장하고 관전자에게 중계, 관리자 목록 갱신
           const { type: _t, ...data } = msg
           void _t
-          onLive?.(userKey, data)
-          touchLive(userKey, data)
-          const out: PushMessage = { type: 'live_update', from: userKey, at: Date.now(), ...(data as object) }
-          const set = spectators.get(userKey)
-          if (set) {
-            const payload = JSON.stringify(out)
-            for (const w of set) if (w.readyState === WebSocket.OPEN) w.send(payload)
-          }
+          handleLive(userKey, data)
         } else if (msg.type === 'ping') {
           ws.send(JSON.stringify({ type: 'pong' }))
         }

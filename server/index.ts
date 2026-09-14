@@ -8,7 +8,7 @@ import { initRedis, REDIS_DB } from './redis'
 import * as store from './store'
 import { initMq, mqReady, publish, consume, QUEUE, type Job } from './mq'
 import { getDomain, findDomain, DOMAIN_PROMPTS, buildDesignerSystem, buildCounterpartSystem, buildCoachSystem, TTS_INSTRUCTIONS_EN_DEFAULT } from './domains'
-import { initRealtime, notify, subscriberCount, setLiveHandler, listLive, clearEndedLive, isAdminToken } from './realtime'
+import { initRealtime, notify, subscriberCount, setLiveHandler, handleLive, listLive, clearEndedLive, isAdminToken } from './realtime'
 
 const PORT = Number(process.env.PORT ?? 8787)
 // 역할별 모델. 상대(면접관·발신자) 턴은 지연이 중요해서 빠른 모델, 리포트는 품질이 중요해서 상위 모델.
@@ -420,9 +420,10 @@ app.get('/api/admin/sessions', async (req, res) => {
 })
 
 // 진행 중 세션 지표 (시연용 관전·디버그)
-app.post('/api/live', async (req, res) => {
-  const { userKey, ...metrics } = req.body ?? {}
-  if (userKey && redisReady) await store.setLive(userKey, metrics)
+// WS 폴백 + 탭 닫힘 beacon(left). WS 경로와 같은 처리(Redis·레지스트리·관전 중계)
+app.post('/api/live', (req, res) => {
+  const { userKey, ...data } = req.body ?? {}
+  if (typeof userKey === 'string' && userKey) handleLive(userKey, data)
   res.json({ ok: true })
 })
 app.get('/api/live/:userKey', async (req, res) => {

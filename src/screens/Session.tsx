@@ -7,6 +7,7 @@ import type { NonverbalSummary, Scenario, SessionLog, SetupInput, Turn } from '.
 import { domainById } from '../lib/domains'
 import { loadTtsPref } from './Setup'
 import { subscribe } from '../lib/ws'
+import { getUserKey } from '../lib/user'
 
 const MAX_MS = 5 * 60 * 1000
 const EMPTY: NonverbalSummary = { eyeContactPct: 0, postureBreaks: 0, faceTouches: 0, smileAvg: 0, longestGazeAwayMs: 0 }
@@ -39,6 +40,11 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   const [turns, setTurns] = useState<Turn[]>([])
   const [interim, setInterim] = useState('')
   const [current, setCurrent] = useState('') // 면접관이 지금 말하는 텍스트
+  // 관전 화면 중계용: 지금 말하는 문장·인식 중인 내 말을 1초마다 함께 보낸다 (interval 클로저에서 읽을 수 있게 ref)
+  const currentRef = useRef('')
+  const interimRef = useRef('')
+  const updateCurrent = (v: string) => { currentRef.current = v; setCurrent(v) }
+  const updateInterim = (v: string) => { interimRef.current = v; setInterim(v) }
   const [elapsed, setElapsed] = useState(0)
   const [error, setError] = useState<string | null>(null)
   // 실전 모드: 화면(카메라/통화)만 크게, 지표·자막·기록 숨김. 세션 중에도 끄고 켤 수 있다
@@ -92,10 +98,10 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
       setElapsed(e)
       if (e > MAX_MS) finish()
       // 2초마다 진행 지표를 WS로 보낸다 (관전 화면 실시간 갱신 + 서버 Redis 저장). 실패해도 무시
-      if (e - lastLive > 2000) {
+      if (e - lastLive > 1000) {
         lastLive = e
         const s = recent()
-        // 늦게 들어온 관전자도 바로 볼 수 있게 제목·상대·최근 대화를 매번 함께 보낸다
+        // 늦게 들어온 관전자도 바로 볼 수 있게 제목·상대·최근 대화를 매번 함께 보낸다. 말하는 중인 문장·인식 중인 내 말도
         postLive({
           elapsedMs: Math.round(e),
           phase: phaseLabelRef.current,
@@ -103,6 +109,8 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
           counterpart: dom.counterpart,
           domain: dom.id,
           name: setup.fields.name ?? '',
+          current: currentRef.current,
+          interim: interimRef.current,
           turns: turnsRef.current.slice(-8).map((t) => ({ role: t.role, text: t.text, at: t.at })),
           ...(s && showVision ? { metrics: { eyeContactPct: s.eyeContactPct, postureBreaks: s.postureBreaks, faceTouches: s.faceTouches, smileAvg: s.smileAvg } } : {}),
         })
@@ -123,7 +131,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
     let countdownIv: number | null = null
     turnsRef.current = []
     pushTurn({ role: 'interviewer', text: scenario.opening, at: 0 })
-    setCurrent(scenario.opening)
+    updateCurrent(scenario.opening)
     setPhase('interviewer')
     health()
       .then((h): TtsMode => (h.tts && loadTtsPref() === 'server' ? 'server' : 'browser'))
@@ -158,6 +166,18 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // 종료 버튼 없이 탭을 닫거나 나가면 관전자·관리자에게 "이탈"을 알린다 (WS는 이 시점에 못 보내므로 beacon)
+  useEffect(() => {
+    const onHide = () => {
+      if (finishedRef.current) return
+      const body = JSON.stringify({ userKey: getUserKey(), left: true, ended: true, phase: '이탈', elapsedMs: Math.round(now()), title: scenario.title, counterpart: dom.counterpart, domain: dom.id, name: setup.fields.name ?? '' })
+      try { navigator.sendBeacon('/api/live', new Blob([body], { type: 'application/json' })) } catch { /* noop */ }
+    }
+    window.addEventListener('pagehide', onHide)
+    return () => window.removeEventListener('pagehide', onHide)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // 실전 모드 키보드: Space = 답변 끝 / 말 끊기, Esc = 종료 확인. 입력창에 타이핑 중일 때는 무시
   useEffect(() => {
     if (!real) return
@@ -188,10 +208,10 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   function startListening() {
     if (finishedRef.current) return
     setPhase('listening')
-    setInterim('')
+    updateInterim('')
     if (textModeRef.current) return // 텍스트 모드: 입력창에서 제출을 기다린다
     const { stop } = listenOnce({
-      onInterim: setInterim,
+      onInterim: updateInterim,
       onFinal: (text) => {
         stopListenRef.current = null
         void handleUserAnswer(text)
@@ -224,9 +244,9 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
     if (finishedRef.current) return
     const nonverbal = recent() ?? undefined
     pushTurn({ role: 'user', text, at: now(), nonverbal })
-    setInterim('')
+    updateInterim('')
     setPhase('thinking')
-    setCurrent('')
+    updateCurrent('')
 
     const history = turnsRef.current.map((t, i, arr) => ({
       role: t.role,
@@ -244,7 +264,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
         if (!full) setPhase('interviewer')
         full += d
         pendingRef.current = full
-        setCurrent(full.replace('[END]', ''))
+        updateCurrent(full.replace('[END]', ''))
         sp.push(d)
       }, ac.signal)
     } catch (e) {
@@ -275,7 +295,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
       if (text) pushTurn({ role: 'interviewer', text: `${text}…`, at: now() })
       ended = pending.includes('[END]')
       pendingRef.current = null
-      setCurrent(text ? `${text}…` : '') // 말풍선에는 끊긴 지점까지 남긴다
+      updateCurrent(text ? `${text}…` : '') // 말풍선에는 끊긴 지점까지 남긴다
     }
     // 스트림이 이미 끝난 뒤(첫 대사 포함) 끊은 경우 말풍선은 그대로 둔다
     if (ended) finish()

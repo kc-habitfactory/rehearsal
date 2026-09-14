@@ -225,6 +225,7 @@ export async function releaseFill(hash: string) {
 export async function setLive(userKey: string, data: Record<string, string | number>) {
   if (!redis) return
   const k = keys.live(userKey)
+  if (data.phase === '시작') await redis.del(k) // 이전 훈련의 ended·turns 같은 필드가 남지 않게
   await redis.hset(k, { ...data, updatedAt: Date.now() })
   await redis.expire(k, 600)
 }

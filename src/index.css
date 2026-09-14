@@ -115,6 +115,9 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .line { color: var(--muted); }
 .line .who { color: var(--text); font-weight: 600; margin-right: 6px; }
 .line.user .who { color: var(--accent); }
+.line.live { opacity: .85; }
+.line.live .cursor { display: inline-block; margin-left: 2px; color: var(--accent); animation: blink 1s steps(2) infinite; }
+@keyframes blink { to { opacity: 0; } }
 
 .report .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
 .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }

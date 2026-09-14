@@ -159,7 +159,7 @@ export function Admin() {
                   {badge(e.domain)}
                   <span className="title">{e.name ? <b>{e.name}</b> : null}{e.name ? ' · ' : ''}{e.title ?? '-'}</span>
                   <span className="muted small">{e.endedAt ? ago(e.endedAt) : ''}</span>
-                  <span className="score">{e.reportStatus === 'done' ? `${e.score}점` : e.reportStatus === 'failed' ? '실패' : '리포트 작성 중'}</span>
+                  <span className="score">{e.left ? '중단(나감)' : e.reportStatus === 'done' ? `${e.score}점` : e.reportStatus === 'failed' ? '실패' : '리포트 작성 중'}</span>
                 </>
               )
               // 세션이 저장되면 sessionId가 채워지고, 그때부터 클릭해 리포트(작성 중이면 진행 화면)를 볼 수 있다
