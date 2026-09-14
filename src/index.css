@@ -165,6 +165,38 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .badge.hospital { background: rgba(0,206,201,.18); color: #00cec9; }
 .badge.immigration { background: rgba(116,185,255,.18); color: #74b9ff; }
 .badge.insurance_consult { background: rgba(253,121,168,.18); color: #fd79a8; }
+.badge.real { background: rgba(232,234,240,.12); color: var(--text); border: 1px solid var(--line); margin-left: 6px; }
+
+/* 준비 화면: 실전 모드 토글 */
+.real-toggle { display: flex; gap: 10px; align-items: flex-start; text-align: left; margin: 8px 0 14px; padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; cursor: pointer; line-height: 1.5; }
+.real-toggle input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: none; }
+
+/* 실전 모드: 화면만 크게. 오른쪽 패널·대화 기록은 숨기고 화면 위에 최소 정보만 얹는다 */
+.session.real .session-main { grid-template-columns: 1fr; }
+.session.real .side, .session.real .transcript { display: none; }
+.session.real .cam-wrap, .session.real .call-screen { max-height: calc(100vh - 56px); margin: 0 auto; width: min(100%, calc((100vh - 56px) * 16 / 9)); }
+.session.real .call-screen { position: relative; }
+.session.real .hud .timer { opacity: .7; }
+.focus-bar { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; align-items: center; padding: 6px 14px 6px 8px; border-radius: 999px; background: rgba(0,0,0,.55); backdrop-filter: blur(6px); white-space: nowrap; }
+.focus-bar .avatar.small { width: 34px; height: 34px; font-size: 15px; }
+.focus-bar .focus-name { font-size: 13px; font-weight: 600; }
+.focus-bar .focus-status { font-size: 12px; color: var(--muted); }
+.focus-bar .focus-status.listening { color: var(--ok); }
+.focus-bar .focus-status.interviewer { color: var(--accent); }
+.real-controls { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; }
+.real-controls .hint { font-size: 12px; color: rgba(232,234,240,.55); margin-right: 4px; }
+.real-controls .ghost.small { background: rgba(0,0,0,.55); backdrop-filter: blur(6px); margin-left: 0; }
+.real-controls .ghost.small.danger { border-color: rgba(255,118,117,.6); color: var(--warn); }
+.overlay.countdown { background: rgba(0,0,0,.6); }
+.overlay.countdown .count { font-size: 96px; font-weight: 800; line-height: 1; color: var(--text); animation: countpop .9s ease-out; }
+@keyframes countpop { from { transform: scale(1.35); opacity: .2; } to { transform: scale(1); opacity: 1; } }
+.overlay.confirm-end { background: rgba(0,0,0,.55); }
+.confirm-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px 26px; text-align: center; }
+.confirm-box p { margin: 0 0 6px; font-size: 17px; }
+.confirm-box .row { justify-content: center; margin-top: 14px; }
+.real-text { position: absolute; left: 12px; right: 12px; bottom: 56px; }
+.real-text textarea { width: 100%; font: inherit; color: var(--text); background: rgba(0,0,0,.7); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 12px; resize: none; }
+@media (max-width: 640px) { .real-controls .hint { display: none; } .focus-bar { top: 6px; padding: 4px 10px 4px 6px; } }
 .tabs { flex-wrap: wrap; }
 
 /* 리포트 대기·예약 */

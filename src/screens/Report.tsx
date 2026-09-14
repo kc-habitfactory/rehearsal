@@ -86,7 +86,7 @@ export function Report({ log, onRestart, onHome }: { log: SessionLog; onRestart:
   return (
     <div className="screen report">
       <h2>{log.setup.fields.name?.trim() ? `${log.setup.fields.name.trim()} 님의 리포트` : '피드백 리포트'}</h2>
-      <p className="muted small">{finishedAt.toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' })} · {domainById(log.setup.domain).name}</p>
+      <p className="muted small">{finishedAt.toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' })} · {domainById(log.setup.domain).name}{log.setup.realMode && <> · <span className="badge real">실전 모드</span></>}</p>
       <ReportView
         title={log.scenario.title}
         durationMs={log.durationMs}

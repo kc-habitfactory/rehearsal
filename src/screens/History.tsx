@@ -25,7 +25,7 @@ export function History({ sessionId, onBack, adminToken, backLabel = '← 홈' }
       {row && (
         <>
           <p className="muted small">
-            {new Date(row.created_at).toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' })} · {domainById(row.setup?.domain ?? 'interview').name}
+            {new Date(row.created_at).toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' })} · {domainById(row.setup?.domain ?? 'interview').name}{row.setup?.realMode && <> · <span className="badge real">실전 모드</span></>}
             {/* 모델 이름과 사용자 키는 개발·운영 정보라 관리자 화면에서만 */}
             {adminToken && <> · {row.report_model ?? ''} · 훈련자 <code className="key">{row.user_key}</code></>}
           </p>

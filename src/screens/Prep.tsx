@@ -10,11 +10,13 @@ interface Props {
   setup: SetupInput
   engineRef: React.MutableRefObject<VisionEngine | null>
   streamRef: React.MutableRefObject<MediaStream | null>
-  onReady: (scenario: Scenario) => void
+  onReady: (scenario: Scenario, realMode: boolean) => void
   onBack: () => void
 }
 
 type Step = 'idle' | 'ok' | 'fail' | 'skip'
+
+const REAL_MODE_KEY = 'rehearsal.realMode'
 
 export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
   const dom = domainById(setup.domain)
@@ -28,6 +30,9 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
   const [model, setModel] = useState<Step>('idle')
   const [calib, setCalib] = useState<Step>('idle')
   const speechOk = speechSupported()
+  // 실전 모드: 세션 중 지표·자막·기록을 숨기고 화면만 본다. 브라우저에 기억
+  const [realMode, setRealMode] = useState<boolean>(() => { try { return localStorage.getItem(REAL_MODE_KEY) === '1' } catch { return false } })
+  const toggleReal = (v: boolean) => { setRealMode(v); try { localStorage.setItem(REAL_MODE_KEY, v ? '1' : '0') } catch { /* noop */ } }
   // 시나리오 생성 진행 표시: 경과 시간 + 단계 문구 회전
   const [scenarioElapsed, setScenarioElapsed] = useState(0)
   const scenarioStartRef = useRef(performance.now())
@@ -214,7 +219,14 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
       {textOnly && <p className="muted small">음성 입력이 불가능해 답변은 텍스트로 입력하게 됩니다. {dom.counterpart} 음성은 그대로 나옵니다.</p>}
       {!dom.usesCamera && <p className="muted small">전화 상황이라 카메라를 쓰지 않습니다. 목소리와 말한 내용으로만 평가합니다.</p>}
       {dom.lang === 'en' && <p className="muted small">영어로 진행됩니다. 음성 인식도 영어로 설정됩니다. 리포트는 한국어로 나옵니다.</p>}
-      <button className="primary big" disabled={!ready} onClick={() => scenario && onReady({ ...scenario, domain: setup.domain })}>
+      <label className="real-toggle">
+        <input type="checkbox" checked={realMode} onChange={(e) => toggleReal(e.target.checked)} />
+        <span>
+          <b>실전 모드</b>
+          <span className="muted small"> · {dom.usesCamera ? '카메라 화면만 보고 진행합니다. 지표·자막·대화 기록은 리포트에서 봅니다.' : '통화 화면만 보고 진행합니다. 자막·대화 기록은 리포트에서 봅니다.'} 3초 카운트다운 뒤 시작, Space 답변 끝·말 끊기, Esc 종료.</span>
+        </span>
+      </label>
+      <button className="primary big" disabled={!ready} onClick={() => scenario && onReady({ ...scenario, domain: setup.domain }, realMode)}>
         {dom.startLabel}
       </button>
     </div>

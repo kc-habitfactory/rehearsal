@@ -9,7 +9,7 @@ import { History } from './History'
 
 const TOKEN_KEY = 'rehearsal.adminToken'
 
-interface PastRow { id: number; user_key: string; nickname?: string | null; domain: string; title: string; score: number | null; report_status: string; created_at: string; duration_ms: number }
+interface PastRow { id: number; user_key: string; nickname?: string | null; domain: string; title: string; score: number | null; report_status: string; created_at: string; duration_ms: number; real_mode?: boolean | number | null }
 
 export function Admin() {
   const [token, setToken] = useState<string | null>(() => { try { return localStorage.getItem(TOKEN_KEY) } catch { return null } })
@@ -178,7 +178,7 @@ export function Admin() {
         {past.map((r) => (
           <button key={r.id} className="admin-row clickable" onClick={() => setViewing(r.id)} title="리포트 보기">
             {badge(r.domain)}
-            <span className="title">{r.title}</span>
+            <span className="title">{r.real_mode ? <span className="badge real">실전</span> : null}{r.title}</span>
             <span className="muted small">{new Date(r.created_at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
             <span className="muted small key">{r.nickname ? <b>{r.nickname}</b> : `${r.user_key.slice(0, 10)}…`}</span>
             <span className="score">{r.report_status === 'pending' ? '생성 중' : r.score !== null ? `${r.score}점` : '–'}</span>

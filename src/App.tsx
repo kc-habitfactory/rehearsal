@@ -64,7 +64,8 @@ function MainApp() {
             releaseCamera()
             setScreen('setup')
           }}
-          onReady={(sc) => {
+          onReady={(sc, realMode) => {
+            setSetup((s) => (s ? { ...s, realMode } : s))
             setScenario(sc)
             setScreen('session')
           }}

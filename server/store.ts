@@ -90,7 +90,8 @@ export async function updateSessionReport(id: number, report: any | null, model:
 export async function listSessions(userKey: string, limit = 10, offset = 0): Promise<SessionRow[]> {
   if (!pool) return []
   const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT id, domain, title, score, eye_contact, duration_ms, report_status, created_at FROM sessions
+    `SELECT id, domain, title, score, eye_contact, duration_ms, report_status, created_at,
+            JSON_EXTRACT(setup, '$.realMode') AS real_mode FROM sessions
      WHERE user_key = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?`,
     [userKey, limit, offset],
   )
@@ -101,7 +102,8 @@ export async function listSessions(userKey: string, limit = 10, offset = 0): Pro
 export async function listAllSessions(limit = 30, offset = 0) {
   if (!pool) return { items: [] as RowDataPacket[], total: 0 }
   const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT s.id, s.user_key, u.nickname, s.domain, s.title, s.score, s.eye_contact, s.duration_ms, s.report_status, s.created_at
+    `SELECT s.id, s.user_key, u.nickname, s.domain, s.title, s.score, s.eye_contact, s.duration_ms, s.report_status, s.created_at,
+            JSON_EXTRACT(s.setup, '$.realMode') AS real_mode
      FROM sessions s LEFT JOIN users u ON u.user_key = s.user_key
      ORDER BY s.created_at DESC, s.id DESC LIMIT ? OFFSET ?`,
     [limit, offset],

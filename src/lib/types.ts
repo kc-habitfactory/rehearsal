@@ -5,6 +5,7 @@ import type { DomainId } from './domains'
 export interface SetupInput {
   domain: DomainId
   fields: Record<string, string> // 도메인별 입력 (domains.ts의 fields 키)
+  realMode?: boolean // 실전 모드: 세션 중 지표·자막·대화 기록을 숨기고 화면만 본다. 리포트·코치에 전달
 }
 
 export interface Scenario {

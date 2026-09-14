@@ -41,6 +41,10 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   const [current, setCurrent] = useState('') // 면접관이 지금 말하는 텍스트
   const [elapsed, setElapsed] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  // 실전 모드: 화면(카메라/통화)만 크게, 지표·자막·기록 숨김. 세션 중에도 끄고 켤 수 있다
+  const [real, setReal] = useState<boolean>(Boolean(setup.realMode))
+  const [countdown, setCountdown] = useState<number | null>(null) // 실전 모드 시작 전 3·2·1
+  const [confirmEnd, setConfirmEnd] = useState(false)
 
   const turnsRef = useRef<Turn[]>([])
   const startRef = useRef(0)
@@ -116,6 +120,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   useEffect(() => {
     let sp: Speaker | null = null
     let cancelled = false
+    let countdownIv: number | null = null
     turnsRef.current = []
     pushTurn({ role: 'interviewer', text: scenario.opening, at: 0 })
     setCurrent(scenario.opening)
@@ -128,16 +133,51 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
         sp = new Speaker(mode, dom.lang ?? 'ko', dom.id)
         speakerRef.current = sp
         sp.onEnd = () => startListening()
-        sp.speak(scenario.opening)
+        const begin = () => {
+          if (cancelled) return
+          startRef.current = performance.now() // 타이머는 상대가 입을 여는 순간부터
+          sp!.speak(scenario.opening)
+        }
+        if (setup.realMode) {
+          // 자세를 잡을 시간. 3, 2, 1 뒤 상대가 말을 시작한다
+          let n = 3
+          setCountdown(n)
+          countdownIv = window.setInterval(() => {
+            n -= 1
+            if (n <= 0) { window.clearInterval(countdownIv!); countdownIv = null; setCountdown(null); begin() } else setCountdown(n)
+          }, 1000)
+        } else begin()
       })
     return () => {
       cancelled = true
+      if (countdownIv) window.clearInterval(countdownIv)
       sp?.cancel()
       stopListenRef.current?.()
       abortRef.current?.abort()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 실전 모드 키보드: Space = 답변 끝 / 말 끊기, Esc = 종료 확인. 입력창에 타이핑 중일 때는 무시
+  useEffect(() => {
+    if (!real) return
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT')) return
+      if (e.code === 'Space') {
+        e.preventDefault()
+        if (countdown !== null || confirmEnd) return
+        if (phase === 'interviewer') interrupt()
+        else if (phase === 'listening' && !textMode) stopListenRef.current?.()
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        setConfirmEnd((v) => !v)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [real, phase, textMode, countdown, confirmEnd])
 
   function pushTurn(t: Turn) {
     turnsRef.current = [...turnsRef.current, t]
@@ -264,9 +304,53 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
 
   const mm = String(Math.floor(elapsed / 60000)).padStart(2, '0')
   const ss = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0')
+  const endLabel = dom.id === 'scam_call' ? '전화 끊기' : dom.id === 'insurance_consult' ? '상담 마치기' : dom.id === 'hospital' ? '진료 끝' : '종료'
+  const statusText = phase === 'interviewer' ? '말하는 중' : phase === 'listening' ? (textMode ? '답변을 입력해 주세요' : '내 차례') : phase === 'thinking' ? '…' : '종료'
+
+  // 실전 모드에서 화면(카메라/통화) 위에 얹는 것들: 렌즈 아래 상대 표시, 카운트다운, 종료 확인, 최소 조작
+  const realOverlays = real && (
+    <>
+      {dom.usesCamera && (
+        <div className="focus-bar" title="상대를 보는 시선이 곧 카메라를 보는 시선입니다">
+          <div className={`avatar small ${phase === 'interviewer' ? 'talking' : ''}`}>{scenario.interviewer.name[0]}</div>
+          <div>
+            <div className="focus-name">{scenario.interviewer.name}</div>
+            <div className={`focus-status ${phase}`}>{statusText}</div>
+          </div>
+        </div>
+      )}
+      {countdown !== null && (
+        <div className="overlay countdown">
+          <div className="count">{countdown}</div>
+          <p>곧 시작합니다. 자세를 잡고 상대를 봐 주세요</p>
+        </div>
+      )}
+      {confirmEnd && (
+        <div className="overlay confirm-end" onClick={() => setConfirmEnd(false)}>
+          <div className="confirm-box" onClick={(e) => e.stopPropagation()}>
+            <p>훈련을 종료할까요?</p>
+            <div className="row">
+              <button className="danger" onClick={finish}>{endLabel}</button>
+              <button onClick={() => setConfirmEnd(false)}>계속하기</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="real-controls">
+        <span className="hint">{phase === 'interviewer' ? 'Space 말 끊고 답하기' : phase === 'listening' && !textMode ? 'Space 답변 끝' : ''}{phase !== 'done' ? ' · Esc 종료' : ''}</span>
+        <button className="ghost small" onClick={() => setReal(false)} title="지표·자막·기록을 다시 보입니다">실전 모드 끄기</button>
+        <button className="ghost small danger" onClick={() => setConfirmEnd(true)}>{endLabel}</button>
+      </div>
+      {real && textMode && phase === 'listening' && (
+        <div className="real-text">
+          <textarea value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitDraft() } }} placeholder="음성 입력이 안 되어 텍스트로 답합니다. Enter로 보내기" rows={2} autoFocus />
+        </div>
+      )}
+    </>
+  )
 
   return (
-    <div className="session">
+    <div className={`session ${real ? 'real' : ''}`}>
       <div className="session-main">
         {!dom.usesCamera ? (
           <div className="call-screen">
@@ -276,16 +360,18 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
               {phase === 'done' ? '통화 종료' : `통화 중 ${mm}:${ss}`}
             </div>
             <div className="call-wave">{phase === 'interviewer' ? '상대가 말하는 중' : phase === 'listening' ? (textMode ? '답변 입력 대기' : '내 차례') : phase === 'thinking' ? '…' : ''}</div>
+            {realOverlays}
           </div>
         ) : (
         <div className="cam-wrap">
           {hasVideo ? <video ref={videoRef} className="cam mirror" muted playsInline /> : <div className="overlay static"><p>카메라 없이 진행 중</p></div>}
           <div className="hud">
-            {showVision && <Pill label={live?.eyeContact ? '시선 유지' : '시선 이탈'} ok={!!live?.eyeContact} />}
-            {showVision && <Pill label={live?.postureOk ? '자세 안정' : '자세 이탈'} ok={!!live?.postureOk} />}
+            {showVision && !real && <Pill label={live?.eyeContact ? '시선 유지' : '시선 이탈'} ok={!!live?.eyeContact} />}
+            {showVision && !real && <Pill label={live?.postureOk ? '자세 안정' : '자세 이탈'} ok={!!live?.postureOk} />}
             <span className="timer">{mm}:{ss}</span>
           </div>
-          {showVision && live && !live.faceFound && <div className="overlay"><p>얼굴이 보이지 않습니다</p></div>}
+          {showVision && live && !live.faceFound && countdown === null && <div className="overlay"><p>얼굴이 보이지 않습니다</p></div>}
+          {realOverlays}
         </div>
         )}
         <div className="side">
@@ -325,7 +411,8 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
             {phase === 'interviewer' && <button onClick={interrupt} title="상대 말을 끊고 바로 답합니다">말 끊고 답하기</button>}
             {phase === 'listening' && !textMode && <button onClick={() => stopListenRef.current?.()}>답변 끝</button>}
             {phase === 'listening' && !textMode && <button onClick={switchToText}>텍스트로 답하기</button>}
-            <button className="danger" onClick={finish}>{dom.id === 'scam_call' ? '전화 끊기' : dom.id === 'insurance_consult' ? '상담 마치기' : dom.id === 'hospital' ? '진료 끝' : '종료'}</button>
+            <button className="danger" onClick={finish}>{endLabel}</button>
+            <button className="ghost small" onClick={() => setReal(true)} title="지표·자막·기록을 숨기고 화면만 봅니다">실전 모드</button>
           </div>
         </div>
       </div>

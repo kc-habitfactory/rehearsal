@@ -179,7 +179,7 @@ export function Home({ onStart, onOpenHistory }: { onStart: () => void; onOpenHi
           <div className="recent-title"><span>최근 훈련</span><span className="muted small">누르면 리포트를 다시 볼 수 있어요</span></div>
           {recent.map((s) => (
             <button key={s.id} className="recent-row" onClick={() => onOpenHistory(s.id)}>
-              <span className="title"><span className={`badge ${s.domain ?? 'interview'}`}>{domainById((s.domain ?? 'interview') as DomainId).short}</span>{s.title}</span>
+              <span className="title"><span className={`badge ${s.domain ?? 'interview'}`}>{domainById((s.domain ?? 'interview') as DomainId).short}</span>{s.real_mode ? <span className="badge real" title="실전 모드로 훈련">실전</span> : null}{s.title}</span>
               <span className="muted small">{new Date(s.created_at).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })}</span>
               <span className="recent-score">{s.report_status === 'pending' ? '생성 중' : s.score !== null ? <>{s.score}<span className="unit">점</span></> : '–'}</span>
             </button>

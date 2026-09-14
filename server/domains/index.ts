@@ -55,5 +55,8 @@ export function buildCounterpartSystem(dom: DomainPrompts, scenario: ScenarioLik
 /** 코치(리포트) system 프롬프트. log 는 클라이언트가 보낸 세션 기록 */
 export function buildCoachSystem(dom: DomainPrompts, log: any): string {
   const base = typeof dom.reportSystem === 'function' ? dom.reportSystem(log) : dom.reportSystem
-  return base + nameNoteFor(dom, log?.setup?.fields, 'coach')
+  const real = log?.setup?.realMode
+    ? `\n[실전 모드] 훈련자는 실시간 지표·자막·대화 기록을 보지 않고 화면(상대)만 보며 진행했다. 실전과 같은 조건이므로 (1) 비언어 지표와 이벤트 타임라인을 더 자세히 짚고, (2) 자막 없이 들은 만큼 질문을 놓치거나 잘못 들은 지점이 있는지 확인하고, (3) headline에 실전 모드였음을 한 번 언급한다.`
+    : ''
+  return base + real + nameNoteFor(dom, log?.setup?.fields, 'coach')
 }
