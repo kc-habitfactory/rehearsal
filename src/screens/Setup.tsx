@@ -28,20 +28,40 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
   const [domainId, setDomainId] = useState<DomainId>(loadLastDomain)
   const dom = domainById(domainId)
   const [fields, setFields] = useState<Record<string, string>>(dom.presets[0])
+  const [presetIdx, setPresetIdx] = useState<number | null>(0) // 예시 칩 선택 상태. 칸을 고치면 강조가 풀린다
 
   const pickDomain = (id: DomainId) => {
     setDomainId(id)
     setFields(domainById(id).presets[0])
+    setPresetIdx(0)
     try { localStorage.setItem(LAST_DOMAIN_KEY, id) } catch { /* noop */ }
   }
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setFields({ ...fields, [k]: e.target.value })
-  // 랜덤은 짧은 칸만 바꾸고, 붙여 둔 공고·이력서는 유지한다
-  const random = () => setFields((prev) => {
-    const preset = dom.presets[Math.floor(Math.random() * dom.presets.length)]
-    const keep: Record<string, string> = {}
-    for (const d of dom.docs ?? []) if (prev[d.key]) keep[d.key] = prev[d.key]
-    return { ...preset, ...keep }
-  })
+  // 예시 적용: 짧은 칸만 바꾸고, 붙여 둔 공고·이력서는 유지한다
+  const applyPreset = (i: number) => {
+    setPresetIdx(i)
+    setFields((prev) => {
+      const preset = dom.presets[i]
+      const keep: Record<string, string> = {}
+      for (const d of dom.docs ?? []) if (prev[d.key]) keep[d.key] = prev[d.key]
+      return { ...preset, ...keep }
+    })
+  }
+  const random = () => {
+    let i = Math.floor(Math.random() * dom.presets.length)
+    if (dom.presets.length > 1 && i === presetIdx) i = (i + 1) % dom.presets.length // 같은 것 연속 방지
+    applyPreset(i)
+  }
+  // 칩 라벨: 예시의 앞 두 칸을 "직무 · 회사"처럼 붙인다. 사내 케이스(해빗팩토리·핀랩)는 ★
+  const INTERNAL = /해빗팩토리|시그널플래너|핀랩|시그널파이낸셜랩/
+  const chipLabel = (p: Record<string, string>) => {
+    const vals = dom.fields.map((f) => (p[f.key] ?? '').trim()).filter(Boolean)
+    const cut = (v: string) => (v.length > 22 ? v.slice(0, 21) + '…' : v)
+    return vals.slice(0, 2).map(cut).join(' · ')
+  }
+  const isInternal = (p: Record<string, string>) => Object.values(p).some((v) => INTERNAL.test(v))
+  // 선택된 칩 강조는 칸 값이 예시와 같을 때만 (고치면 풀림)
+  const chipActive = (i: number) => presetIdx === i && dom.fields.every((f) => (fields[f.key] ?? '').trim() === (dom.presets[i][f.key] ?? '').trim())
   const [docStatus, setDocStatus] = useState<Record<string, string>>({})
   const setDoc = (key: string, raw: string) => {
     const { text, truncated } = clampDoc(raw)
@@ -82,6 +102,20 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
           </label>
         ))}
       </div>
+      <div className="presets">
+        <div className="presets-head">
+          <span className="muted small">예시로 채우기 · {dom.presets.length}개{dom.presets.some(isInternal) ? ' · ★ 사내 케이스' : ''}</span>
+          <button type="button" className="ghost small" onClick={random} title="예시 중 하나를 무작위로 채웁니다"><span aria-hidden>🎲</span> 랜덤</button>
+        </div>
+        <div className="chips">
+          {dom.presets.map((p, i) => (
+            <button key={i} type="button" className={`chip ${chipActive(i) ? 'active' : ''} ${isInternal(p) ? 'internal' : ''}`} onClick={() => applyPreset(i)} title={dom.fields.map((f) => `${f.label.replace(/\s*\(.*$/, '')}: ${p[f.key] ?? ''}`).join('\n')}>
+              {isInternal(p) && <span className="star" aria-label="사내 케이스">★</span>}{chipLabel(p)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {dom.docs && (
         <div className="docs">
           {dom.docs.map((d) => (
@@ -109,11 +143,10 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
         {dom.id === 'scam_call'
           ? '사기 전화인지 진짜 기관의 전화인지는 미리 알려주지 않습니다. 통화 중에 스스로 판단하세요.'
           : `${dom.counterpart}의 성향과 돌발 변수는 AI가 정하고 미리 알려주지 않습니다.`}
-        {' '}칸은 자유롭게 적어도 됩니다. "랜덤으로"는 준비된 예시 {dom.presets.length}개 중 하나를 고릅니다.
+        {' '}칸은 자유롭게 적어도 됩니다. 예시를 누른 뒤 고쳐 써도 됩니다.
       </p>
 
       <div className="row">
-        <button onClick={random}>랜덤으로</button>
         <button className="primary" onClick={() => onNext({ domain: domainId, fields: { ...fields, name: getNickname() ?? '' } })}>다음: 준비</button>
       </div>
     </div>

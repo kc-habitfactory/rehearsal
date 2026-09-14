@@ -247,6 +247,20 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 /* 도메인 탭 */
 .tabs { display: flex; gap: 8px; margin: 8px 0 12px; }
 .tab { border-radius: 999px; padding: 8px 16px; }
+
+/* 예시 칩: 준비된 예시를 한눈에 보고 눌러서 칸을 채운다 */
+.presets { margin: 4px 0 14px; }
+.presets-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.presets-head .ghost.small { margin-left: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); max-width: 100%; text-align: left; }
+.chip:hover { color: var(--text); border-color: var(--accent); }
+.chip.active { color: var(--text); border-color: var(--accent); background: rgba(108,92,231,.16); }
+.chip .star { color: #ffc107; margin-right: 4px; font-size: 11px; }
+@media (max-width: 640px) {
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+  .chip { flex: none; white-space: nowrap; }
+}
 .tab.active { background: var(--accent); border-color: var(--accent); }
 
 
