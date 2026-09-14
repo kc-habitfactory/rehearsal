@@ -1,8 +1,9 @@
 /* 점수 색 구간과 중단 판정. 목록·관전·리포트가 같은 규칙을 쓴다.
- * 70점 이상 = 잘함(초록), 40~69 = 보통(기본 글자색), 40 미만 = 다시(빨강). 사용자 발화가 2회 미만이면 점수 대신 "중단". */
+ * 70점 이상 = 잘함(초록), 40~69 = 보통(기본 글자색), 40 미만 = 다시(빨강). 사용자가 한 마디도 하지 않고 끝났으면 점수 대신 "중단".
+ * (1회는 중단이 아니다: 사기 전화는 "필요 없습니다" 한마디로 끊는 것이 정답이라 발화 1회로 정상 종료된다.) */
 export type ScoreBand = 'good' | 'mid' | 'low'
 
-export const ABORT_MAX_USER_TURNS = 1 // 이 수 이하의 발화로 끝난 세션은 점수 대신 "중단"
+export const ABORT_MAX_USER_TURNS = 0 // 이 수 이하의 발화로 끝난 세션은 점수 대신 "중단"
 
 export function scoreBand(score: number): ScoreBand {
   return score >= 70 ? 'good' : score >= 40 ? 'mid' : 'low'
