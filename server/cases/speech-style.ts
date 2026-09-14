@@ -88,6 +88,12 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['감정으로 시작해 사실이 늦게 나옴', '다른 아이·학부모 비난', '교사 관찰에 즉각 반박', '"지켜봐 주세요" 같은 모호한 요구', '상대 학생 처벌·연락처 요구'],
     cpm: [260, 360], answerSec: [10, 45], latencySec: [0.8, 3],
   },
+  claimant: {
+    key: 'claimant', name: '이의신청형: 차분하게 서면·조항·접수번호를 요구, 감정 대신 절차',
+    likes: ['첫 문장에 건 내용과 요구("부지급 사유를 약관 조항과 함께 서면으로 주세요")', '거절 사유에 맞는 자료를 말하고 재심사 접수 요구', '의료자문엔 사유·기관 서면 요구와 동시감정', '끊기 전 접수번호·담당자·회신 기한 확인', '정중하되 같은 요구를 반복'],
+    dislikes: ['"왜 안 주냐" 반복', '감정·인격 공격', '의료자문에 그냥 동의', '제도를 틀리게 말함', '기한·번호 없이 "검토해 주세요"로 끝'],
+    cpm: [260, 360], answerSec: [6, 35], latencySec: [0.5, 3],
+  },
   consultant: {
     key: 'consultant', name: '상담사형: 쉬운 말로 한 번에 하나씩, 단정하지 않고, 제안 뒤 침묵을 견디기',
     likes: ['고객 상황을 먼저 묻고 되짚기("~하신 거죠?")', '전문용어는 비유·예시로, 한 번에 한 가지', '"고객님 상황에서는 ~한 경우 유리합니다"처럼 조건부 표현', '핵심 제안 뒤 3~5초 침묵, 결정 재촉 금지', '거절에는 압박 대신 "한두 달 뒤 안부 겸 연락" 수준의 후속 약속'],
@@ -121,6 +127,7 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
     case 'insurance_consult': return P.consultant
     case 'money_talk': return P.boundary
     case 'parent_teacher': return P.parent
+    case 'claim_appeal': return P.claimant
     default: return P.general
   }
 }

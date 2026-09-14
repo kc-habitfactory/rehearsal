@@ -1,6 +1,6 @@
 /* 훈련 도메인 정의 (클라이언트). 서버의 server/domains.ts와 id를 맞춘다. */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher' | 'claim_appeal'
 
 export interface FieldDef {
   key: string
@@ -316,6 +316,33 @@ export const DOMAINS: DomainDef[] = [
       { child: '초6 아들', topic: '우리 아이가 가해자로 지목됨', situation: '다른 학부모가 학교에 연락했다고 담임이 알림', goal: '사실 확인과 아이 입장 전달, 절차 이해' },
       { child: '고2 딸', topic: '교우관계와 무기력', situation: '친구를 만나지 않고 성적 관심도 떨어짐', goal: '학교에서의 모습 확인, 상담 연계 가능성' },
       { child: '초5 아들', topic: '담임의 지도 방식에 대한 불만', situation: '아이가 선생님이 자기만 혼낸다고 함', goal: '오해인지 확인하고 관계 풀기 (감정 조절 훈련)' },
+    ],
+  },
+  {
+    id: 'claim_appeal',
+    name: '실손 청구 거절 이의신청',
+    short: '청구 이의',
+    description: '보험사가 거절한 실손 청구 건으로 보상 담당자에게 전화해 이의를 제기합니다. 서면 사유·약관 조항 요구, 소견서 재심사, 의료자문 대응(제3의료기관 동시감정), 손해사정사 선임권, 금감원 민원까지 2025~26 실제 절차와 통계 기반. 부지급이 정당한 건도 섞여 있어 판단력도 봅니다.',
+    counterpart: '보상 담당자',
+    startLabel: '고객센터 전화',
+    answerHint: '담당자가 듣고 있습니다. 말씀하세요',
+    usesCamera: false,
+    fields: [
+      { key: 'claim', label: '청구 내용', placeholder: '예: 도수치료 12회차 18만 원' },
+      { key: 'denial', label: '보험사 거절 통보', placeholder: '예: 문자로 "치료 효과 불인정, 약관상 부지급"' },
+      { key: 'situation', label: '내 상황', placeholder: '예: 4세대 실손, 허리 디스크 진단, 주치의 소견서 받을 수 있음' },
+      { key: 'goal', label: '원하는 결과', placeholder: '예: 재심사 접수와 서면 사유 확보' },
+    ],
+    presets: [
+      { claim: '도수치료 12회차 18만 원', denial: '문자로 "10회 이후 치료 효과 불인정, 약관상 부지급"', situation: '4세대 실손, 허리 디스크 진단, 주치의 소견서 받을 수 있음', goal: '서면 사유 확보와 재심사 접수' },
+      { claim: '비급여 영양 수액 3회 27만 원', denial: '"예방·피로 회복 목적은 보장 제외"', situation: '3세대 실손, 급성 장염으로 처방받은 수액', goal: '치료 목적 소견서로 재심사' },
+      { claim: '백내장 다초점렌즈 수술 380만 원', denial: '"입원 필요성 없어 통원 한도 25만 원만 인정"', situation: '2세대 실손, 양안 수술, 병원은 입원 처리', goal: '거절 근거 확인과 대응 방향 결정' },
+      { claim: '무릎 MRI·주사 치료 62만 원', denial: '"가입 전 무릎 진료 이력 미고지로 계약 해지 및 부지급"', situation: '2년 전 가입, 가입 전 단순 타박상 진료 1회', goal: '고지의무 위반 주장의 근거와 인과관계 확인' },
+      { claim: '입원 7일 실손 210만 원', denial: '"진료기록지·세부내역서 추가 제출 요청" 후 두 달 무응답', situation: '서류는 이미 두 번 보냄', goal: '접수 상태 확인, 기한과 담당자 확보' },
+      { claim: '체외충격파 8회 40만 원', denial: '"의료자문 동의 후 재검토 가능"', situation: '4세대 실손, 족저근막염, 의료자문 동의서가 우편으로 옴', goal: '동의 전 자문 사유·기관 확인, 동시감정 요구' },
+      { claim: '하지정맥류 레이저 시술 190만 원', denial: '"미용 목적으로 판단"', situation: '통증·부종 기록 있음, 3세대 실손', goal: '치료 목적 입증 자료로 재심사' },
+      { claim: '통원 치료 12회 36만 원', denial: '"본인부담상한제 환급 예정액 공제 후 지급"', situation: '4세대 실손, 공제 계산 근거를 못 받음', goal: '공제 근거 약관 조항과 계산서 서면 요구' },
+      { claim: '어깨 도수치료 6회 9만 원', denial: '"약관상 부보장 항목"이라고만 통보', situation: '무슨 조항인지 설명 없음, 5세대 실손로 전환한 첫 청구', goal: '정확한 거절 조항 확인 (부지급이 정당할 수도 있음)' },
     ],
   },
 ]
