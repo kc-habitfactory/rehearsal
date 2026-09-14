@@ -157,7 +157,7 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
     exec_qa: ['임원 성향을 정하는 중', '핵심 메시지의 약점을 찾는 중', '질문 흐름을 짜는 중', '돌발 변수를 심는 중', '첫 질문을 다듬는 중'],
     hospital: ['의사 성향을 정하는 중', '확인할 정보 목록을 만드는 중', '환자가 놓치기 쉬운 지점을 심는 중', '첫 질문을 다듬는 중'],
     immigration: ['Picking the officer', 'Planning the question flow', 'Adding a twist', 'Polishing the first line'],
-    insurance_consult: ['신청서 뒤에 숨은 고객 사정을 정하는 중', '고객 성향과 알고 있는 정보를 정하는 중', '2026 제도 사실을 맞추는 중', '돌발 변수를 심는 중', '첫 말을 다듬는 중'],
+    insurance_consult: ['신청서 뒤에 숨은 고객 사정을 정하는 중', '고객 성향 여섯 축을 정하는 중', '2026 제도 사실을 맞추는 중', '돌발 변수를 심는 중', '전화 받는 첫 말을 다듬는 중'],
   }
   const stageMsgs = STAGES[dom.id] ?? STAGES.interview
   const timedMsg = stageMsgs[Math.min(stageMsgs.length - 1, Math.floor(scenarioElapsed / 4))]

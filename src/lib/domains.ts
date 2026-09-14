@@ -245,12 +245,14 @@ export const DOMAINS: DomainDef[] = [
     fields: [
       { key: 'topic', label: '상담 주제 (신청서)', placeholder: '예: 4세대 실손 보험료 20% 인상, 5세대 전환 문의' },
       { key: 'customer', label: '고객 (신청서 요약)', placeholder: '예: 42세 자영업, 4세대 실손 + 종신 1건' },
+      { key: 'persona', label: '고객 성향 (선택 · 비우면 AI가 정함)', placeholder: '예: 까칠함, 질문 많음, 보험 불신, 설계사 불신, 보험 지식 낮음, 조급함' },
       { key: 'level', label: '난이도', placeholder: '초급 / 중급 / 고급' },
       { key: 'career', label: '내 경력', placeholder: '신입 / 1년차 / 3년 이상' },
     ],
     presets: [
-      { topic: '4세대 실손 보험료 20% 인상 통지, 5세대로 갈아타야 하나', customer: '42세 자영업, 4세대 실손 + 종신 1건, 허리 치료 중', level: '중급', career: '신입' },
-      { topic: '보험료가 부담돼 전부 해지하고 싶다', customer: '35세 직장인, 월 보험료 38만 원, 무·저해지 종신 2건 포함', level: '중급', career: '1년차' },
+      { topic: '4세대 실손 보험료 20% 인상 통지, 5세대로 갈아타야 하나', customer: '42세 자영업, 4세대 실손 + 종신 1건, 허리 치료 중', persona: '', level: '중급', career: '신입' },
+      { topic: '보험료가 부담돼 전부 해지하고 싶다', customer: '35세 직장인, 월 보험료 38만 원, 무·저해지 종신 2건 포함', persona: '까칠함, 설계사 불신 강함, 조급함', level: '중급', career: '1년차' },
+      { topic: '실손 갱신 안내 문자를 보고 뭐가 바뀌는지 궁금하다', customer: '61세 주부, 2세대 실손, 자녀가 앱 설치해 줌', persona: '질문 많음, 보험 지식 거의 없음, 매우 여유, 친절', level: '초급', career: '신입' },
       { topic: '3세대 실손 16% 인상, 유지가 맞는지', customer: '58세 주부, 3세대 실손, 병원 거의 안 감', level: '초급', career: '신입' },
       { topic: '타사 설계사가 제안한 리모델링 안 비교', customer: '47세 회사원, 타사 제안서 보유, 총 6건 가입', level: '고급', career: '3년 이상' },
       { topic: '부모님(72세) 실손 1세대 유지 vs 전환', customer: '40세 자녀가 대신 문의, 부모님이 결정', level: '중급', career: '1년차' },
