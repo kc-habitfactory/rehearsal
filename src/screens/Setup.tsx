@@ -18,9 +18,9 @@ export function loadTtsPref(): 'server' | 'browser' {
 function loadLastDomain(): DomainId {
   try {
     const v = localStorage.getItem(LAST_DOMAIN_KEY) as DomainId | null
-    return v && DOMAINS.some((d) => d.id === v) ? v : 'interview'
+    return v && DOMAINS.some((d) => d.id === v) ? v : DOMAINS[0].id
   } catch {
-    return 'interview'
+    return DOMAINS[0].id
   }
 }
 
