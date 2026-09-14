@@ -105,7 +105,6 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
             <button key={d.id} className={`dom-item ${d.id === domainId ? 'active' : ''}`} onClick={(e) => { pickDomain(d.id); e.currentTarget.scrollIntoView({ inline: 'center', block: 'nearest' }) }}>
               <span className="dom-ico" aria-hidden>{d.icon}</span>
               <span className="dom-name">{d.name}</span>
-              <span className="dom-count">{d.presets.length}개</span>
               <span className="dom-chev" aria-hidden>›</span>
             </button>
           ))}
