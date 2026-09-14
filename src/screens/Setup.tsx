@@ -5,15 +5,6 @@ import { getNickname } from '../lib/user'
 import { extractText, clampDoc, DOC_MAX_CHARS } from '../lib/extract-text'
 
 const LAST_DOMAIN_KEY = 'rehearsal.lastDomain'
-export const TTS_PREF_KEY = 'rehearsal.tts' // 'server' | 'browser'. UI 없음. 디버그용으로 localStorage에 'browser'를 넣으면 브라우저 음성.
-
-export function loadTtsPref(): 'server' | 'browser' {
-  try {
-    return localStorage.getItem(TTS_PREF_KEY) === 'browser' ? 'browser' : 'server'
-  } catch {
-    return 'server'
-  }
-}
 
 function loadLastDomain(): DomainId {
   try {

@@ -5,7 +5,8 @@ import { listenOnce, Speaker, speechSupported, type TtsMode } from '../lib/speec
 import { formatNonverbal, type LiveState, type VisionEngine } from '../lib/vision'
 import type { NonverbalSummary, Scenario, SessionLog, SetupInput, Turn } from '../lib/types'
 import { domainById } from '../lib/domains'
-import { loadTtsPref } from './Setup'
+import { loadTtsPref } from '../lib/prefs'
+import { clearInflight, saveInflight, type Inflight } from '../lib/inflight'
 import { subscribe } from '../lib/ws'
 import { getUserKey } from '../lib/user'
 
@@ -20,16 +21,18 @@ interface Props {
   engine: VisionEngine | null // null이면 비언어 분석 없이 진행
   stream: MediaStream | null // null이면 카메라·마이크 없음
   onFinish: (log: SessionLog) => void
+  resume?: Inflight // 새로고침 전 진행 중이던 세션. 있으면 첫 대사를 다시 하지 않고 마지막 질문에서 이어간다
 }
 
-export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
+export function Session({ setup, scenario, engine, stream, onFinish, resume }: Props) {
   const dom = domainById(setup.domain)
   const showVision = Boolean(engine) && dom.usesCamera
   const videoRef = useRef<HTMLVideoElement>(null)
   const hasVideo = Boolean(stream?.getVideoTracks().length)
   const hasMic = Boolean(stream?.getAudioTracks().length)
-  const [textMode, setTextMode] = useState(!hasMic || !speechSupported())
+  const [textMode, setTextMode] = useState(resume ? (resume.textMode || !speechSupported()) : (!hasMic || !speechSupported()))
   const [draft, setDraft] = useState('')
+  const [resumed] = useState(Boolean(resume))
 
   const [live, setLive] = useState<LiveState | null>(null)
   const [phase, setPhaseState] = useState<Phase>('interviewer')
@@ -73,7 +76,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   const endedRef = useRef(false) // 마지막 응답에 [END]가 있었는지 (재생 중 끊어도 종료로)
   const abortRef = useRef<AbortController | null>(null)
   const finishedRef = useRef(false)
-  const clientIdRef = useRef<string>(crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+  const clientIdRef = useRef<string>(resume?.clientId ?? crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`)
   const textModeRef = useRef(textMode)
   textModeRef.current = textMode
 
@@ -142,9 +145,24 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
     let sp: Speaker | null = null
     let cancelled = false
     let countdownIv: number | null = null
-    turnsRef.current = []
-    pushTurn({ role: 'interviewer', text: scenario.opening, at: 0 })
-    updateCurrent(scenario.opening)
+    if (resume) {
+      // 이어하기: 기록을 복원하고 마지막 질문을 말풍선에 둔 채 바로 답을 기다린다 (첫 대사 재생 없음).
+      // 보내지 못한 내 답이 마지막이면 입력창에 되살려 다시 보내게 한다
+      let restored = resume.turns
+      if (restored.length && restored[restored.length - 1].role === 'user') {
+        setDraft(restored[restored.length - 1].text)
+        restored = restored.slice(0, -1)
+      }
+      turnsRef.current = restored
+      setTurns(restored)
+      const lastQ = [...restored].reverse().find((t) => t.role === 'interviewer')
+      updateCurrent(lastQ?.text ?? scenario.opening)
+      startRef.current = performance.now() - resume.elapsedMs
+    } else {
+      turnsRef.current = []
+      pushTurn({ role: 'interviewer', text: scenario.opening, at: 0 })
+      updateCurrent(scenario.opening)
+    }
     setPhase('interviewer')
     health()
       .then((h): TtsMode => (h.tts && loadTtsPref() === 'server' ? 'server' : 'browser'))
@@ -154,6 +172,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
         sp = new Speaker(mode, dom.lang ?? 'ko', dom.id)
         speakerRef.current = sp
         sp.onEnd = () => startListening()
+        if (resume) { startListening(); return }
         const begin = () => {
           if (cancelled) return
           startRef.current = performance.now() // 타이머는 상대가 입을 여는 순간부터
@@ -217,6 +236,8 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
     turnsRef.current = [...turnsRef.current, t]
     setTurns(turnsRef.current)
     postLive({ turn: { role: t.role, text: t.text, at: t.at }, elapsedMs: Math.round(now()) }) // 관전자에게 대사 즉시 중계
+    // 새로고침 대비 보존 (탭 단위). 종료 시 지운다
+    saveInflight({ setup, scenario, turns: turnsRef.current, elapsedMs: Math.round(now()), clientId: clientIdRef.current, textMode: textModeRef.current })
   }
 
   function startListening() {
@@ -329,6 +350,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   function finish() {
     if (finishedRef.current) return
     finishedRef.current = true
+    clearInflight()
     setPhase('done')
     postLive({ ended: true, phase: '종료', elapsedMs: Math.round(now()), title: scenario.title, counterpart: dom.counterpart, turns: turnsRef.current.slice(-8).map((t) => ({ role: t.role, text: t.text, at: t.at })) })
     stopListenRef.current?.()
@@ -433,6 +455,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
             </span>
           </div>
 
+          {resumed && <div className="resume-note">화면이 새로 고쳐져 이어서 진행합니다. 마지막 질문에 답해 주세요.</div>}
           <div className="speech">{current || '…'}</div>
 
           {phase === 'listening' && !textMode && (

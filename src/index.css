@@ -120,6 +120,7 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .status.listening { background: rgba(46,204,113,.18); color: var(--ok); }
 .status.thinking { animation: fade 1s infinite alternate; }
 @keyframes fade { to { opacity: .45; } }
+.resume-note { font-size: 12px; color: var(--muted); padding: 6px 10px; border-radius: 8px; background: var(--accent-soft); }
 .speech { font-size: 18px; line-height: 1.6; padding: 4px 2px; min-height: 3.2em; overflow-wrap: anywhere; word-break: keep-all; }
 .you-line { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-left: 3px solid var(--ok); background: rgba(46,204,113,.06); border-radius: 0 12px 12px 0; line-height: 1.5; }
 .you-line.empty .you-text { color: var(--muted); }

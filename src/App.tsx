@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { loadInflight } from './lib/inflight'
 import { Home } from './screens/Home'
 import { Setup } from './screens/Setup'
 import { Prep } from './screens/Prep'
@@ -19,9 +20,12 @@ export default function App() {
 }
 
 function MainApp() {
-  const [screen, setScreen] = useState<Screen>('home')
-  const [setup, setSetup] = useState<SetupInput | null>(null)
-  const [scenario, setScenario] = useState<Scenario | null>(null)
+  // 새로고침(개발 서버 재배포 포함) 직전에 진행 중이던 세션이 있으면 홈이 아니라 그 세션으로 바로 돌아간다
+  const [inflight] = useState(loadInflight)
+  const resumeRef = useRef(inflight)
+  const [screen, setScreen] = useState<Screen>(inflight ? 'session' : 'home')
+  const [setup, setSetup] = useState<SetupInput | null>(inflight?.setup ?? null)
+  const [scenario, setScenario] = useState<Scenario | null>(inflight?.scenario ?? null)
   const [log, setLog] = useState<SessionLog | null>(null)
   const [historyId, setHistoryId] = useState<number | null>(null)
   const engineRef = useRef<VisionEngine | null>(null)
@@ -77,7 +81,9 @@ function MainApp() {
           scenario={scenario}
           engine={engineRef.current}
           stream={streamRef.current}
+          resume={resumeRef.current ?? undefined}
           onFinish={(l) => {
+            resumeRef.current = null
             setLog(l)
             releaseCamera()
             setScreen('report')
