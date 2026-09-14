@@ -419,21 +419,28 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
         </div>
         )}
         <div className="side">
-          <div className="interviewer-card">
+          <div className="who-card">
             <div className={`avatar ${phase === 'interviewer' ? 'talking' : ''}`}>{scenario.interviewer.name[0]}</div>
-            <div>
-              <div className="muted small">{scenario.interviewer.name.startsWith(dom.counterpart) ? scenario.interviewer.name : `${dom.counterpart} · ${scenario.interviewer.name}`}</div>
-              <div className="phase">
-                {phase === 'interviewer' && '말하는 중'}
-                {phase === 'listening' && (textMode ? '답변을 입력해 주세요' : dom.answerHint)}
-                {phase === 'thinking' && '...'}
-                {phase === 'done' && '종료'}
-              </div>
+            <div className="who-text">
+              <div className="who-name">{scenario.interviewer.name}</div>
+              <div className="who-role muted small">{scenario.interviewer.name.startsWith(dom.counterpart) ? scenario.interviewer.style : dom.counterpart}</div>
             </div>
+            <span className={`status ${phase}`}>
+              {phase === 'interviewer' && '말하는 중'}
+              {phase === 'listening' && '내 차례'}
+              {phase === 'thinking' && '생각 중'}
+              {phase === 'done' && '종료'}
+            </span>
           </div>
-          <div className="bubble interviewer">{current || '…'}</div>
 
-          {phase === 'listening' && !textMode && <div className="bubble user">{interim || '(말씀해 주세요)'}</div>}
+          <div className="speech">{current || '…'}</div>
+
+          {phase === 'listening' && !textMode && (
+            <div className={`you-line ${interim ? '' : 'empty'}`}>
+              <span className="mic-dot" />
+              <span className="you-text">{interim || dom.answerHint}</span>
+            </div>
+          )}
           {phase === 'listening' && textMode && (
             <div className="text-answer">
               <textarea
@@ -444,19 +451,27 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
                 rows={3}
                 autoFocus
               />
-              <button className="primary" onClick={submitDraft} disabled={!draft.trim()}>보내기</button>
             </div>
           )}
 
-          {showVision && <Gauge label="시선 유지 (최근 30초)" value={live?.eyeContactPct ?? 100} ok={(live?.eyeContactPct ?? 100) >= 60} />}
-          {showVision && <Gauge label="미소" value={Math.min(100, (live?.smile ?? 0) * 150)} />}
+          {showVision && (
+            <div className="meters">
+              <Gauge label="시선" value={live?.eyeContactPct ?? 100} ok={(live?.eyeContactPct ?? 100) >= 60} />
+              <Gauge label="미소" value={Math.min(100, (live?.smile ?? 0) * 150)} />
+            </div>
+          )}
           {error && <p className="error small">{error}</p>}
-          <div className="row">
-            {phase === 'interviewer' && <button onClick={interrupt} title="상대 말을 끊고 바로 답합니다">말 끊고 답하기</button>}
-            {phase === 'listening' && !textMode && <button onClick={() => stopListenRef.current?.()}>답변 끝</button>}
-            {phase === 'listening' && !textMode && <button onClick={switchToText}>텍스트로 답하기</button>}
-            <button className="danger" onClick={finish}>{endLabel}</button>
-            <button className="ghost small" onClick={() => setReal(true)} title="지표·자막·기록을 숨기고 화면만 봅니다">실전 모드</button>
+
+          <div className="actions">
+            {phase === 'interviewer' && <button className="main-action outline" onClick={interrupt} title="상대 말을 끊고 바로 답합니다">말 끊고 답하기 <kbd>Space</kbd></button>}
+            {phase === 'listening' && !textMode && <button className="main-action primary" onClick={() => stopListenRef.current?.()}>답변 끝 <kbd>Space</kbd></button>}
+            {phase === 'listening' && textMode && <button className="main-action primary" onClick={submitDraft} disabled={!draft.trim()}>보내기 <kbd>Enter</kbd></button>}
+            {phase === 'thinking' && <button className="main-action outline" disabled>상대가 생각하는 중…</button>}
+            <div className="sub-actions">
+              {phase === 'listening' && !textMode && <button className="link-btn" onClick={switchToText}>텍스트로 답하기</button>}
+              <button className="link-btn" onClick={() => setReal(true)} title="지표·자막·기록을 숨기고 화면만 봅니다">실전 모드</button>
+              <button className="link-btn danger" onClick={finish}>{endLabel}</button>
+            </div>
           </div>
         </div>
       </div>
