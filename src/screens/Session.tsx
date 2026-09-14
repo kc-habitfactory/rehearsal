@@ -33,7 +33,9 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
 
   const [live, setLive] = useState<LiveState | null>(null)
   const [phase, setPhaseState] = useState<Phase>('interviewer')
+  const phaseRef = useRef<Phase>('interviewer')
   const setPhase = (p: Phase) => {
+    phaseRef.current = p
     setPhaseState(p)
     phaseLabelRef.current = p === 'interviewer' ? `${dom.counterpart} 말하는 중` : p === 'listening' ? '훈련자 답변 중' : p === 'thinking' ? '상대 생각 중' : '종료'
   }
@@ -49,8 +51,12 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   const [error, setError] = useState<string | null>(null)
   // 실전 모드: 화면(카메라/통화)만 크게, 지표·자막·기록 숨김. 세션 중에도 끄고 켤 수 있다
   const [real, setReal] = useState<boolean>(Boolean(setup.realMode))
-  const [countdown, setCountdown] = useState<number | null>(null) // 실전 모드 시작 전 3·2·1
-  const [confirmEnd, setConfirmEnd] = useState(false)
+  const [countdown, setCountdownState] = useState<number | null>(null) // 실전 모드 시작 전 3·2·1
+  const countdownRef = useRef<number | null>(null)
+  const setCountdown = (v: number | null) => { countdownRef.current = v; setCountdownState(v) }
+  const [confirmEnd, setConfirmEndState] = useState(false)
+  const confirmEndRef = useRef(false)
+  const setConfirmEnd = (v: boolean) => { confirmEndRef.current = v; setConfirmEndState(v) }
 
   const turnsRef = useRef<Turn[]>([])
   const startRef = useRef(0)
@@ -178,26 +184,27 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 실전 모드 키보드: Space = 답변 끝 / 말 끊기, Esc = 종료 확인. 입력창에 타이핑 중일 때는 무시
+  // 실전 모드 키보드: Space = 답변 끝 / 말 끊기, Esc = 종료 확인. 입력창에 타이핑 중일 때는 무시.
+  // 상태는 ref 로 읽는다: 렌더 클로저에 묶으면 카운트다운이 끝난 직후 잠깐 옛 핸들러가 남아 Space 를 무시한다.
   useEffect(() => {
     if (!real) return
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null
       if (t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT')) return
-      if (e.code === 'Space') {
+      if (e.code === 'Space' || e.key === ' ') {
         e.preventDefault()
-        if (countdown !== null || confirmEnd) return
-        if (phase === 'interviewer') interrupt()
-        else if (phase === 'listening' && !textMode) stopListenRef.current?.()
+        if (countdownRef.current !== null || confirmEndRef.current) return
+        if (phaseRef.current === 'interviewer') interrupt()
+        else if (phaseRef.current === 'listening' && !textModeRef.current) stopListenRef.current?.()
       } else if (e.key === 'Escape') {
         e.preventDefault()
-        setConfirmEnd((v) => !v)
+        setConfirmEnd(!confirmEndRef.current)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [real, phase, textMode, countdown, confirmEnd])
+  }, [real])
 
   function pushTurn(t: Turn) {
     turnsRef.current = [...turnsRef.current, t]
@@ -357,7 +364,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
         </div>
       )}
       <div className="real-controls">
-        <span className="hint">{phase === 'interviewer' ? 'Space 말 끊고 답하기' : phase === 'listening' && !textMode ? 'Space 답변 끝' : ''}{phase !== 'done' ? ' · Esc 종료' : ''}</span>
+        <span className="hint">{phase === 'interviewer' ? 'Space 말 끊고 답하기' : phase === 'listening' && !textMode ? 'Space 답변 끝' : ''}{phase !== 'done' ? ` · Esc ${endLabel}` : ''}</span>
         <button className="ghost small" onClick={() => setReal(false)} title="지표·자막·기록을 다시 보입니다">실전 모드 끄기</button>
         <button className="ghost small danger" onClick={() => setConfirmEnd(true)}>{endLabel}</button>
       </div>
