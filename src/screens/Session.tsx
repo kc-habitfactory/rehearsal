@@ -325,7 +325,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
             {phase === 'interviewer' && <button onClick={interrupt} title="상대 말을 끊고 바로 답합니다">말 끊고 답하기</button>}
             {phase === 'listening' && !textMode && <button onClick={() => stopListenRef.current?.()}>답변 끝</button>}
             {phase === 'listening' && !textMode && <button onClick={switchToText}>텍스트로 답하기</button>}
-            <button className="danger" onClick={finish}>{dom.id === 'scam_call' ? '전화 끊기' : dom.id === 'hospital' ? '진료 끝' : '종료'}</button>
+            <button className="danger" onClick={finish}>{dom.id === 'scam_call' ? '전화 끊기' : dom.id === 'insurance_consult' ? '상담 마치기' : dom.id === 'hospital' ? '진료 끝' : '종료'}</button>
           </div>
         </div>
       </div>

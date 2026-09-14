@@ -164,6 +164,7 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .badge.exec_qa { background: rgba(255,193,7,.18); color: #ffc107; }
 .badge.hospital { background: rgba(0,206,201,.18); color: #00cec9; }
 .badge.immigration { background: rgba(116,185,255,.18); color: #74b9ff; }
+.badge.insurance_consult { background: rgba(253,121,168,.18); color: #fd79a8; }
 .tabs { flex-wrap: wrap; }
 
 /* 리포트 대기·예약 */

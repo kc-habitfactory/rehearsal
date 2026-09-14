@@ -1,6 +1,6 @@
 /* 훈련 도메인 정의 (클라이언트). 서버의 server/domains.ts와 id를 맞춘다. */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult'
 
 export interface FieldDef {
   key: string
@@ -205,6 +205,33 @@ export const DOMAINS: DomainDef[] = [
       { destination: '미국 뉴욕 (ESTA)', purpose: '단기 출장 (파트너 미팅)', stay: '1주', level: '고급' },
       { destination: '독일 베를린', purpose: '스타트업 컨퍼런스 참가', stay: '6일', level: '중급' },
       { destination: '뉴질랜드 오클랜드 (NZeTA)', purpose: '워킹홀리데이 입국', stay: '12개월', level: '고급' },
+    ],
+  },
+  {
+    id: 'insurance_consult',
+    name: '보험 상담 (상담사)',
+    short: '보험 상담',
+    description: '내가 시그널파이낸셜랩 상담사가 되어, 시그널플래너에서 상담을 신청한 고객에게 콜백 전화를 합니다. 고객은 매번 다른 숨은 사정을 갖고 있고, 2026년 실제 제도(5세대 실손, 보험료 인상, 수수료 공시)를 기준으로 정확성과 설명의무까지 평가합니다.',
+    counterpart: '고객',
+    startLabel: '콜백 전화 걸기',
+    answerHint: '고객이 듣고 있습니다. 상담하세요',
+    usesCamera: false,
+    fields: [
+      { key: 'topic', label: '상담 주제 (신청서)', placeholder: '예: 4세대 실손 보험료 20% 인상, 5세대 전환 문의' },
+      { key: 'customer', label: '고객 (신청서 요약)', placeholder: '예: 42세 자영업, 4세대 실손 + 종신 1건' },
+      { key: 'level', label: '난이도', placeholder: '초급 / 중급 / 고급' },
+      { key: 'career', label: '내 경력', placeholder: '신입 / 1년차 / 3년 이상' },
+    ],
+    presets: [
+      { topic: '4세대 실손 보험료 20% 인상 통지, 5세대로 갈아타야 하나', customer: '42세 자영업, 4세대 실손 + 종신 1건, 허리 치료 중', level: '중급', career: '신입' },
+      { topic: '보험료가 부담돼 전부 해지하고 싶다', customer: '35세 직장인, 월 보험료 38만 원, 무·저해지 종신 2건 포함', level: '중급', career: '1년차' },
+      { topic: '3세대 실손 16% 인상, 유지가 맞는지', customer: '58세 주부, 3세대 실손, 병원 거의 안 감', level: '초급', career: '신입' },
+      { topic: '타사 설계사가 제안한 리모델링 안 비교', customer: '47세 회사원, 타사 제안서 보유, 총 6건 가입', level: '고급', career: '3년 이상' },
+      { topic: '부모님(72세) 실손 1세대 유지 vs 전환', customer: '40세 자녀가 대신 문의, 부모님이 결정', level: '중급', career: '1년차' },
+      { topic: '무·저해지 종신이 싸다던데 가입하고 싶다', customer: '29세 첫 직장, 보험 처음, 유튜브 정보', level: '초급', career: '신입' },
+      { topic: '숨은보험금 청구 가능하다고 앱에 떠서 문의', customer: '51세 자영업, 실손 2세대, 최근 입원 이력', level: '초급', career: '1년차' },
+      { topic: '어린이보험·태아보험 신규 가입', customer: '33세 임신 7개월, 첫 아이', level: '중급', career: '신입' },
+      { topic: '이 전화 사기 아니냐, 시그널플래너 사칭 뉴스 봤다', customer: '63세, 앱으로 숨은보험금 조회 후 상담 신청', level: '고급', career: '1년차' },
     ],
   },
 ]
