@@ -541,9 +541,9 @@ input.pw { font: inherit; color: var(--text); background: var(--panel); border: 
 .call-avatar.ringing { animation: ringshake .5s ease-in-out infinite; }
 @keyframes ringshake { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-6deg); } 40% { transform: rotate(6deg); } 60% { transform: rotate(-4deg); } 80% { transform: rotate(4deg); } }
 
-/* 점수 색 구간 (src/lib/score.ts 와 같은 규칙): 70+ 초록 · 40~69 기본 · 40 미만 빨강 · 중단 회색 */
+/* 점수 색 구간 (src/lib/score.ts 와 같은 규칙): 70+ 초록 · 40~69 호박색 · 40 미만 빨강 · 중단 회색 */
 .score-good, .recent-row .recent-score.score-good, .admin-row .score.score-good, .score-card .score.score-good, .spectator-result .score.score-good { color: var(--ok); }
-.score-mid, .recent-row .recent-score.score-mid, .admin-row .score.score-mid, .score-card .score.score-mid, .spectator-result .score.score-mid { color: var(--text); }
+.score-mid, .recent-row .recent-score.score-mid, .admin-row .score.score-mid, .score-card .score.score-mid, .spectator-result .score.score-mid { color: #f6c453; }
 .score-low, .recent-row .recent-score.score-low, .admin-row .score.score-low, .score-card .score.score-low, .spectator-result .score.score-low { color: var(--warn); }
 .score-abort, .recent-row .recent-score.score-abort, .admin-row .score.score-abort { color: var(--muted); font-weight: 500; }
 .score-none, .recent-row .recent-score.score-none, .admin-row .score.score-none { color: var(--muted); font-weight: 500; }
