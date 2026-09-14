@@ -66,5 +66,6 @@ export interface Report {
   scoreBreakdown?: { item: string; max: number; score: number; note: string }[] // 항목별 배점
   speech?: string[] // 말투·전달 코멘트 (측정치 + 인용)
   speechProfile?: string // 이 상황이 선호하는 화법 한 줄
-  coverage?: { requirement: string; status: '증명' | '부분' | '미답'; note: string }[] // 공고 요구사항 대비 (공고를 넣은 면접만)
+  coverage?: { requirement: string; status: '증명' | '부분' | '미답' | '확인' | '미확인'; note: string }[] // 공고 요구사항 대비 (공고를 넣은 면접·면접관)
+  candidateReview?: string // 면접관 훈련: 지원자가 남길 법한 가상 후기
 }

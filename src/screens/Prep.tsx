@@ -161,6 +161,7 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
     money_talk: ['지인의 진짜 사정을 정하는 중', '압박형인지 정상 부탁인지 정하는 중', '압박 전술 순서를 짜는 중', '관계에 맞는 말투를 정하는 중', '첫 말을 다듬는 중'],
     parent_teacher: ['담임의 관찰 사실을 정하는 중', '안내할 절차를 맞추는 중', '담임 성향을 정하는 중', '돌발 변수를 심는 중', '첫 인사를 다듬는 중'],
     claim_appeal: ['부지급이 정당한지 애매한지 정하는 중', '약관 근거와 인정 범위를 정하는 중', '담당자 전술 순서를 짜는 중', '돌발 변수를 심는 중', '콜센터 첫 인사를 다듬는 중'],
+    hiring_interviewer: ['지원자 유형을 정하는 중', '이력서에 과장 항목을 심는 중', '질문 유형별 반응 규칙을 짜는 중', '역질문을 준비하는 중', '첫 인사를 다듬는 중'],
   }
   const stageMsgs = STAGES[dom.id] ?? STAGES.interview
   const timedMsg = stageMsgs[Math.min(stageMsgs.length - 1, Math.floor(scenarioElapsed / 4))]

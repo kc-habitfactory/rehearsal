@@ -1,6 +1,6 @@
 /* 훈련 도메인 정의 (클라이언트). 서버의 server/domains.ts와 id를 맞춘다. */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher' | 'claim_appeal'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher' | 'claim_appeal' | 'hiring_interviewer'
 
 export interface FieldDef {
   key: string
@@ -343,6 +343,37 @@ export const DOMAINS: DomainDef[] = [
       { claim: '하지정맥류 레이저 시술 190만 원', denial: '"미용 목적으로 판단"', situation: '통증·부종 기록 있음, 3세대 실손', goal: '치료 목적 입증 자료로 재심사' },
       { claim: '통원 치료 12회 36만 원', denial: '"본인부담상한제 환급 예정액 공제 후 지급"', situation: '4세대 실손, 공제 계산 근거를 못 받음', goal: '공제 근거 약관 조항과 계산서 서면 요구' },
       { claim: '어깨 도수치료 6회 9만 원', denial: '"약관상 부보장 항목"이라고만 통보', situation: '무슨 조항인지 설명 없음, 5세대 실손로 전환한 첫 청구', goal: '정확한 거절 조항 확인 (부지급이 정당할 수도 있음)' },
+    ],
+  },
+  {
+    id: 'hiring_interviewer',
+    name: '면접관 (기업용)',
+    short: '면접관',
+    description: '내가 면접관이 되어 AI 지원자를 면접합니다. 지원자는 과장·준비·장황·긴장·전환·시니어 유형 중 하나이고 이력서에 검증해야 할 과장 항목이 숨어 있습니다. 구조화 질문, 꼬리질문 검증, 채용절차법·인권위 금지 질문, 후보자 경험(면접 경험이 기업 이미지에 영향 93%)을 평가하고 지원자가 남길 가상 후기까지 보여 줍니다.',
+    counterpart: '지원자',
+    startLabel: '면접 시작',
+    answerHint: '지원자가 기다립니다. 질문하세요',
+    usesCamera: true,
+    fields: [
+      { key: 'role', label: '채용 직무' },
+      { key: 'company', label: '회사 유형', placeholder: '예: 핀테크 스타트업 / 해빗팩토리' },
+      { key: 'candidate', label: '지원자 프로필', placeholder: '예: 경력 3년, 이직 2회 / 경력 단절 후 복귀 / 45세 시니어' },
+      { key: 'competencies', label: '검증할 역량 (2~3개)', placeholder: '예: 문제 해결, 협업, 오너십, AI 활용' },
+    ],
+    docs: [
+      { key: 'jd', label: '채용 공고 (선택)', hint: '공고를 붙이면 요구사항을 확인했는지 코치가 봅니다.' },
+      { key: 'resume', label: '지원자 이력서 (선택 · 가상 권장)', hint: 'AI 지원자가 이 이력서를 가진 사람으로 답합니다. 과장 항목 1~2개가 숨겨집니다. 원문은 저장하지 않습니다.' },
+    ],
+    presets: [
+      { role: '백엔드 개발자', company: '핀테크 스타트업', candidate: '경력 3년, 이직 1회, 성과 수치가 많은 이력서', competencies: '문제 해결, 본인 기여 검증, AI 활용' },
+      { role: '퍼포먼스 마케터', company: '커머스', candidate: '신입, 인턴 2회, 포트폴리오 화려함', competencies: '데이터 해석, 실행력, 협업' },
+      { role: '서비스 기획자(PM)', company: 'IT 서비스 기업', candidate: '경력 5년, 대기업에서 스타트업으로', competencies: '우선순위 판단, 이해관계 조정, 오너십' },
+      { role: '프로덕트 디자이너', company: '해빗팩토리 (핀테크 · 시그널플래너)', candidate: '경력 4년, 포트폴리오 리뷰 단계', competencies: '문제 정의, 데이터 기반 개선, 개발 협업' },
+      { role: '데이터 분석가', company: '보험사', candidate: '경력 단절 3년 후 복귀 지원 (금지 질문 유혹이 큰 유형)', competencies: '분석 설계, 커뮤니케이션, 학습 속도' },
+      { role: '영업 관리', company: '보험 GA', candidate: '45세 시니어, 면접관보다 경력이 김', competencies: '성과 관리, 조직 적응, 변화 수용' },
+      { role: '보험 상담사 (신입)', company: '시그널파이낸셜랩(핀랩)', candidate: '무경력 신입, 서비스업 출신', competencies: '학습 태도, 고객 응대, 성실성' },
+      { role: 'QA 엔지니어', company: '게임 회사', candidate: '경력 2년, 긴장이 심한 유형', competencies: '꼼꼼함, 재현·보고 능력, 협업' },
+      { role: 'AI·LLM 엔지니어', company: 'AI 스타트업', candidate: '경력 4년, 프레임워크 이름을 많이 나열하는 유형', competencies: '평가·검증 방법, 비용 관리, 실패 경험' },
     ],
   },
 ]

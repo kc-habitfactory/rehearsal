@@ -94,6 +94,12 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['"왜 안 주냐" 반복', '감정·인격 공격', '의료자문에 그냥 동의', '제도를 틀리게 말함', '기한·번호 없이 "검토해 주세요"로 끝'],
     cpm: [260, 360], answerSec: [6, 35], latencySec: [0.5, 3],
   },
+  interviewer: {
+    key: 'interviewer', name: '면접관형: 질문은 한 번에 하나·두 문장, 듣는 시간이 말하는 시간의 두 배',
+    likes: ['"이력서에 쓰신 ○○" 인용으로 시작', '경험 질문 → 꼬리질문(왜·대안·기여·수치)', '중립적이고 차분한 톤, 끝까지 듣고 되짚기', '오프닝에 흐름·시간, 클로징에 다음 단계'],
+    dislikes: ['질문이 길거나 두 개를 한 번에', '답변 도중 끊기', '사적·차별 소지 질문', '면접관 발화 비율 30% 초과', '평가·판단어를 면접 중에 말함("좋네요/약하네요")'],
+    cpm: [250, 350], answerSec: [3, 20], latencySec: [0.5, 3],
+  },
   consultant: {
     key: 'consultant', name: '상담사형: 쉬운 말로 한 번에 하나씩, 단정하지 않고, 제안 뒤 침묵을 견디기',
     likes: ['고객 상황을 먼저 묻고 되짚기("~하신 거죠?")', '전문용어는 비유·예시로, 한 번에 한 가지', '"고객님 상황에서는 ~한 경우 유리합니다"처럼 조건부 표현', '핵심 제안 뒤 3~5초 침묵, 결정 재촉 금지', '거절에는 압박 대신 "한두 달 뒤 안부 겸 연락" 수준의 후속 약속'],
@@ -128,6 +134,7 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
     case 'money_talk': return P.boundary
     case 'parent_teacher': return P.parent
     case 'claim_appeal': return P.claimant
+    case 'hiring_interviewer': return P.interviewer
     default: return P.general
   }
 }

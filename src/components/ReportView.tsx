@@ -123,12 +123,18 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
               <h3>공고 요구사항 대비</h3>
               <div className="coverage-list">
                 {report.coverage.map((c, i) => (
-                  <div key={i} className={`coverage-row ${c.status === '증명' ? 'ok' : c.status === '부분' ? 'partial' : 'miss'}`}>
+                  <div key={i} className={`coverage-row ${c.status === '증명' || c.status === '확인' ? 'ok' : c.status === '부분' ? 'partial' : 'miss'}`}>
                     <span className="cov-status">{c.status}</span>
                     <div><div className="cov-req">{c.requirement}</div><div className="muted small">{c.note}</div></div>
                   </div>
                 ))}
               </div>
+            </section>
+          )}
+          {report.candidateReview && (
+            <section className="review">
+              <h3>지원자가 남길 법한 후기 (가상)</h3>
+              <blockquote className="candidate-review">{report.candidateReview}</blockquote>
             </section>
           )}
           <section>
