@@ -7,7 +7,7 @@ import { initDb, DB_DATABASE } from './db'
 import { initRedis, REDIS_DB } from './redis'
 import * as store from './store'
 import { initMq, mqReady, publish, consume, QUEUE, type Job } from './mq'
-import { getDomain, findDomain, DOMAIN_PROMPTS, buildDesignerSystem, buildCounterpartSystem, buildCoachSystem, TTS_INSTRUCTIONS_EN_DEFAULT } from './domains'
+import { getDomain, findDomain, DOMAIN_PROMPTS, buildDesignerSystem, buildCounterpartSystem, buildCoachSystem, maxUserTurnsOf, TTS_INSTRUCTIONS_EN_DEFAULT } from './domains'
 import { initRealtime, notify, subscriberCount, setLiveHandler, handleLive, listLive, clearEndedLive, isAdminToken } from './realtime'
 
 const PORT = Number(process.env.PORT ?? 8787)
@@ -178,15 +178,20 @@ app.post('/api/turn', async (req, res) => {
       role: h.role === 'user' ? ('user' as const) : ('assistant' as const),
       content: h.text,
     }))
+    // 대화 길이 제어: 상대에게 현재 사용자 발화 수를 알려 마무리 규칙을 적용하고, 최대치에 도달했으면 [END]를 서버가 보장한다
+    const userTurns = history.filter((h) => h.role === 'user').length
+    const maxTurns = maxUserTurnsOf(dom)
     const stream = client.messages.stream({
       model: TURN_MODEL,
       max_tokens: 300,
-      system: buildCounterpartSystem(dom, scenario),
+      system: buildCounterpartSystem(dom, scenario, { userTurns }),
       messages,
     })
+    let full = ''
     for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') send(event.delta.text)
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') { full += event.delta.text; send(event.delta.text) }
     }
+    if (userTurns >= maxTurns && !full.includes('[END]')) send(' [END]')
     res.write('event: done\ndata: {}\n\n')
     res.end()
   } catch (e) {

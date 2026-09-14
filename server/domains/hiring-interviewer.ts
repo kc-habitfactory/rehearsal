@@ -11,6 +11,7 @@ const docs = (f: Record<string, string> | undefined) => {
 
 export const hiringInterviewer: DomainPrompts = {
   id: 'hiring_interviewer',
+  maxUserTurns: 8, // 사용자 발화 8번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'shimmer', instructions: '면접에 온 지원자. 정중한 존댓말, 약간의 긴장이 느껴지지만 또렷하다. 준비한 답은 매끄럽고 예상 못 한 꼬리질문에는 잠깐 머뭇거린다.' },
   describeInput: (f) => {
     const { jd, resume } = docs(f)

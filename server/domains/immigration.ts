@@ -4,6 +4,7 @@ import { IMMIGRATION_REAL_CASES, IMMIGRATION_COACH_BRIEF } from '../cases/immigr
 
 export const immigration: DomainPrompts = {
   id: 'immigration',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   lang: 'en',
   voice: { voice: 'ash', instructions: 'US immigration officer. Neutral American English, brisk and matter-of-fact, slightly clipped. Not unfriendly, but not warm.' },
   // 여권 이름 기준. 영어 호칭(Mr./Ms. + 로마자 성). 코치 리포트는 한국어라 기본 규칙

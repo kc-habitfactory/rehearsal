@@ -4,6 +4,7 @@ import { casesForDesigner, casesForCoach } from '../cases/scam-call'
 
 export const scamCall: DomainPrompts = {
   id: 'scam_call',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'shimmer', instructions: '콜센터 상담원 톤. 친절하고 유창하며 문장 사이 쉼이 짧다. 약간 서두르는 느낌, 밝고 확신 있게. 전화 통화처럼 자연스럽게.' },
   describeInput: (f) => `상황: ${f.scenario}\n사용자가 연기할 사람: ${f.persona}\n난이도: ${f.level}`,
   scenarioSystem: `당신은 금융사기(보이스피싱) 대응 훈련 시나리오 설계자다. 사용자는 전화를 받는 사람 역할이고, AI는 발신자 역할을 한다.

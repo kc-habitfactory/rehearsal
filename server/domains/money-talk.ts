@@ -6,6 +6,7 @@ const isBorrowing = (f: Record<string, string> | undefined) => /빌리는|부탁
 
 export const moneyTalk: DomainPrompts = {
   id: 'money_talk',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'verse', instructions: '가까운 지인. 편한 반말 또는 친근한 존댓말, 감정이 실린 자연스러운 대화. 급할 땐 빠르고 서운할 땐 낮아진다.' },
   describeInput: (f) => `내 역할: ${f.side}\n관계: ${f.relation}\n금액: ${f.amount}\n상황: ${f.situation}`,
   scenarioSystem: (f) => `당신은 "지인과 돈 이야기" 훈련 시나리오 설계자다. 두 방향이 있다.

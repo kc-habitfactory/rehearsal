@@ -28,6 +28,8 @@ export interface DomainPrompts {
   lang?: 'ko' | 'en'
   /** 도메인별 목소리와 말투. 같은 TTS 모델이라도 지시문에 따라 톤이 크게 달라진다. 없으면 서버 기본값 */
   voice?: { voice: string; instructions: string }
+  /** 이 상황에서 사용자 발화 최대 횟수. 이 횟수에 도달하면 상대는 반드시 마무리하고 [END]. 기본 6 (서버가 강제) */
+  maxUserTurns?: number
   /** 훈련자 이름을 "상대가 이미 아는 정보"로 다루는 지시. 없으면 defaultNameNote(한국어 "OO 님") */
   nameNote?: (name: string, where: NoteWhere) => string
   /** 설정 입력을 한 줄 문자열로 */

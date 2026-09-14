@@ -5,6 +5,7 @@ import { CLAIM_APPEAL_FACTS, CLAIM_APPEAL_COACH_BRIEF } from '../cases/claim-app
 
 export const claimAppeal: DomainPrompts = {
   id: 'claim_appeal',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'echo', instructions: '보험사 보상심사 담당자. 정중하고 매뉴얼적인 콜센터 존댓말, 약관 용어를 자연스럽게 쓰며 감정이 거의 없다. 말이 빠르지 않고 또렷하다.' },
   describeInput: (f) => `청구 내용: ${f.claim}\n보험사 거절 통보: ${f.denial}\n내 상황: ${f.situation}\n원하는 결과: ${f.goal}`,
   scenarioSystem: `당신은 "실손보험 청구 거절 이의신청" 훈련 시나리오 설계자다. 사용자는 실손 청구가 거절된 소비자이고, AI는 보험사 보상(심사) 담당자다. 사용자가 보험사 고객센터로 전화해 이의를 제기하는 통화다.

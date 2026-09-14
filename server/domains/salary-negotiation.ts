@@ -4,6 +4,7 @@ import { SALARY_REAL_CASES, SALARY_COACH_BRIEF } from '../cases/salary-negotiati
 
 export const salaryNegotiation: DomainPrompts = {
   id: 'salary_negotiation',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'coral', instructions: '회사 측 협상 상대(대표 또는 인사 매니저). 부드럽고 프로페셔널한 한국어, 여유 있는 속도. 상대를 배려하지만 단호한 지점은 분명하게.' },
   describeInput: (f) => `직무: ${f.role}\n현재 연봉: ${f.current}\n희망 연봉: ${f.target}\n상황: ${f.situation}`,
   scenarioSystem: `당신은 연봉 협상 훈련 시나리오 설계자다. 사용자는 오퍼를 받은(또는 연봉 조정을 요청하는) 지원자·직원이고, AI는 회사 측 협상 상대 역할을 한다.

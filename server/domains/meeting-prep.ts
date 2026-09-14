@@ -7,6 +7,7 @@ const spec = (f: Record<string, string> | undefined) => (f?.spec ?? '').trim().s
 
 export const meetingPrep: DomainPrompts = {
   id: 'meeting_prep',
+  maxUserTurns: 5, // 사용자 발화 5번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'coral', instructions: '회의를 진행하는 PM. 또렷하고 빠르지 않은 존댓말, 시험관처럼 차갑지 않고 동료처럼 담담하다. 질문은 짧고 한 번에 하나.' },
   describeInput: (f) => {
     const s = spec(f)

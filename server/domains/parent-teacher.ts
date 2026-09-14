@@ -5,6 +5,7 @@ import { PARENT_TEACHER_FACTS, PARENT_TEACHER_COACH_BRIEF } from '../cases/paren
 
 export const parentTeacher: DomainPrompts = {
   id: 'parent_teacher',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'alloy', instructions: '30대 후반 담임교사. 차분하고 또렷한 존댓말, 아이 이야기를 할 때는 따뜻하지만 사실은 분명하게. 시간이 빠듯한 느낌이 살짝 있다.' },
   describeInput: (f) => `자녀: ${f.child}\n상담 주제: ${f.topic}\n내가 아는 상황: ${f.situation}\n원하는 결과: ${f.goal}`,
   scenarioSystem: `당신은 학부모 상담 훈련 시나리오 설계자다. 사용자는 학부모이고, AI는 자녀의 담임교사다. 학부모가 상담을 신청해 학교(또는 전화)로 담임을 만난 15분 상담이다.

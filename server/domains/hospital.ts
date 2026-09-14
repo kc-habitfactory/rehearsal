@@ -4,6 +4,7 @@ import { HOSPITAL_REAL_FACTS, HOSPITAL_COACH_BRIEF } from '../cases/hospital'
 
 export const hospital: DomainPrompts = {
   id: 'hospital',
+  maxUserTurns: 5, // 사용자 발화 5번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'alloy', instructions: '바쁜 내과 의사. 빠르고 사무적이지만 무례하지 않게. 질문은 짧고 명확하게.' },
   describeInput: (f) => `증상: ${f.symptom}\n기간·경과: ${f.duration}\n나: ${f.persona}`,
   scenarioSystem: `당신은 병원 진료 대화 훈련 시나리오 설계자다. 사용자는 환자이고, AI는 의사 역할이다. 목표는 환자가 짧은 진료 시간 안에 증상을 정확히 전달하고, 필요한 질문을 하고, 설명을 이해했는지 확인하는 연습이다.

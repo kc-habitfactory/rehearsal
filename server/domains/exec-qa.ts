@@ -4,6 +4,7 @@ import { EXEC_REAL_PATTERNS, EXEC_COACH_BRIEF } from '../cases/exec-qa'
 
 export const execQa: DomainPrompts = {
   id: 'exec_qa',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'onyx', instructions: '50대 임원. 낮고 무게 있는 목소리, 짧고 단호하게. 불필요한 억양 없이 핵심만 찌르는 톤.' },
   describeInput: (f) => `보고 주제: ${f.topic}\n핵심 메시지: ${f.message}\n보고 대상: ${f.audience}\n상황: ${f.situation}`,
   scenarioSystem: `당신은 임원 보고 질의응답 훈련 시나리오 설계자다. 사용자는 보고를 마친 발표자이고, AI는 임원(대표·CFO·본부장 등) 역할로 질의응답을 진행한다. 발표 자체는 이미 끝났다고 가정하고 첫 질문부터 시작한다.

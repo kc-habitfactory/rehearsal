@@ -7,6 +7,7 @@ const guide = (f: Record<string, string> | undefined) => (f?.guide ?? '').trim()
 
 export const customerInterview: DomainPrompts = {
   id: 'customer_interview',
+  maxUserTurns: 8, // 사용자 발화 8번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'sage', instructions: '인터뷰에 응한 일반 고객. 편한 존댓말, 처음엔 짧고 예의 바르게, 편해지면 이야기가 길어진다. 감정 단어가 나올 땐 톤이 살짝 낮아진다.' },
   describeInput: (f) => {
     const g = guide(f)

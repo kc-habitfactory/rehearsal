@@ -5,6 +5,7 @@ import { isFinlabHiring, FINLAB_RP_FOR_DESIGNER, FINLAB_RP_FOR_COACH } from '../
 
 export const interview: DomainPrompts = {
   id: 'interview',
+  maxUserTurns: 6, // 사용자 발화 6번째에 상대가 마무리 (서버가 [END] 보장)
   voice: { voice: 'nova', instructions: '30대 후반 실무 팀 리드. 차분하고 단정한 한국어, 문장 끝을 분명하게. 감정을 크게 드러내지 않고 질문은 또렷하게.' },
   describeInput: (f) => {
     const base = `직무: ${f.role}\n회사 유형: ${f.company}\n면접 단계: ${f.stage}\n경력: ${f.years}`
