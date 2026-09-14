@@ -136,6 +136,9 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .breakdown-head .pts b { color: var(--accent); font-size: 16px; }
 .breakdown-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
 .breakdown-fill { height: 100%; background: var(--accent); transition: width .3s; }
+/* 말투와 전달 */
+.speech-profile { margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--panel); border-radius: 0 10px 10px 0; line-height: 1.5; }
+.speech-stats { margin: 0 0 8px !important; }
 .headline { font-size: 17px; line-height: 1.5; }
 .report ul { padding-left: 20px; line-height: 1.7; }
 .qa { margin: 10px 0; }

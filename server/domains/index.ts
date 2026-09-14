@@ -2,6 +2,7 @@
  * 3) src/lib/domains.ts 에 같은 id 로 클라이언트 정의 4) 지식베이스는 ../cases 에 */
 import { type DomainId, type DomainPrompts, type ScenarioLike, defaultNameNote } from './shared'
 import { habitfactoryCounterpartNote, habitfactoryDesignerNote } from '../cases/habitfactory'
+import { speechBriefForCoach } from '../cases/speech-style'
 import { interview } from './interview'
 import { scamCall } from './scam-call'
 import { salaryNegotiation } from './salary-negotiation'
@@ -58,5 +59,6 @@ export function buildCoachSystem(dom: DomainPrompts, log: any): string {
   const real = log?.setup?.realMode
     ? `\n[실전 모드] 훈련자는 실시간 지표·자막·대화 기록을 보지 않고 화면(상대)만 보며 진행했다. 실전과 같은 조건이므로 (1) 비언어 지표와 이벤트 타임라인을 더 자세히 짚고, (2) 자막 없이 들은 만큼 질문을 놓치거나 잘못 들은 지점이 있는지 확인하고, (3) headline에 실전 모드였음을 한 번 언급한다.`
     : ''
-  return base + real + nameNoteFor(dom, log?.setup?.fields, 'coach')
+  const speech = speechBriefForCoach(dom.id, log?.setup?.fields, log?.turns, dom.lang ?? 'ko')
+  return base + real + speech + nameNoteFor(dom, log?.setup?.fields, 'coach')
 }

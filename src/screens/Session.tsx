@@ -46,7 +46,14 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   const currentRef = useRef('')
   const interimRef = useRef('')
   const updateCurrent = (v: string) => { currentRef.current = v; setCurrent(v) }
-  const updateInterim = (v: string) => { interimRef.current = v; setInterim(v) }
+  const updateInterim = (v: string) => {
+    interimRef.current = v
+    if (v.trim() && firstSoundRef.current === null) firstSoundRef.current = performance.now() // 내 첫 소리
+    setInterim(v)
+  }
+  // 말투 측정: 듣기 시작 시각, 첫 소리 시각
+  const listenStartRef = useRef<number | null>(null)
+  const firstSoundRef = useRef<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
   const [error, setError] = useState<string | null>(null)
   // 실전 모드: 화면(카메라/통화)만 크게, 지표·자막·기록 숨김. 세션 중에도 끄고 켤 수 있다
@@ -215,6 +222,8 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   function startListening() {
     if (finishedRef.current) return
     setPhase('listening')
+    listenStartRef.current = performance.now()
+    firstSoundRef.current = null
     updateInterim('')
     if (textModeRef.current) return // 텍스트 모드: 입력창에서 제출을 기다린다
     const { stop } = listenOnce({
@@ -250,7 +259,15 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
   async function handleUserAnswer(text: string) {
     if (finishedRef.current) return
     const nonverbal = recent() ?? undefined
-    pushTurn({ role: 'user', text, at: now(), nonverbal })
+    // 시간 지표: 텍스트 모드면 제외, 음성이면 첫 소리까지 지연과 말한 시간
+    const t0 = performance.now()
+    const timing = textModeRef.current
+      ? { textMode: true }
+      : {
+          latencyMs: listenStartRef.current !== null && firstSoundRef.current !== null ? Math.max(0, Math.round(firstSoundRef.current - listenStartRef.current)) : undefined,
+          speakMs: firstSoundRef.current !== null ? Math.max(0, Math.round(t0 - firstSoundRef.current)) : undefined,
+        }
+    pushTurn({ role: 'user', text, at: now(), nonverbal, timing })
     updateInterim('')
     setPhase('thinking')
     updateCurrent('')

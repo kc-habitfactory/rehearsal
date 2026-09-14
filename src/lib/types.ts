@@ -1,3 +1,4 @@
+import type { TurnTiming } from './speech-metrics'
 export type Screen = 'home' | 'setup' | 'prep' | 'session' | 'report' | 'history'
 
 import type { DomainId } from './domains'
@@ -25,6 +26,7 @@ export interface Turn {
   text: string
   at: number // ms since session start
   nonverbal?: NonverbalSummary
+  timing?: TurnTiming // 내 발화의 시간 지표 (말투 분석용)
 }
 
 export interface NonverbalSummary {
@@ -59,5 +61,7 @@ export interface Report {
   perQuestion: { question: string; comment: string }[]
   nonverbal: string[] // 타임라인 코멘트
   nextTraining: string
-  scoreBreakdown?: { item: string; max: number; score: number; note: string }[] // 항목별 배점. 누르면 보는 근거
+  scoreBreakdown?: { item: string; max: number; score: number; note: string }[] // 항목별 배점
+  speech?: string[] // 말투·전달 코멘트 (측정치 + 인용)
+  speechProfile?: string // 이 상황이 선호하는 화법 한 줄
 }

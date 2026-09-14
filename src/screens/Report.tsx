@@ -99,6 +99,7 @@ export function Report({ log, onRestart, onHome }: { log: SessionLog; onRestart:
         error={error}
         counterpart={domainById(log.setup.domain).counterpart}
         hasVision={domainById(log.setup.domain).usesCamera}
+        lang={domainById(log.setup.domain).lang ?? 'ko'}
       />
       {!report && !error && sessionId !== null && (
         <p className="muted small">기록은 이미 저장됐습니다. 지금 나가도 홈의 최근 훈련에서 완성된 리포트를 볼 수 있습니다.</p>

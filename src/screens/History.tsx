@@ -40,6 +40,7 @@ export function History({ sessionId, onBack, adminToken, backLabel = '← 홈' }
             loadingStage="writing"
             counterpart={domainById(row.setup?.domain ?? 'interview').counterpart}
             hasVision={domainById(row.setup?.domain ?? 'interview').usesCamera}
+            lang={domainById(row.setup?.domain ?? 'interview').lang ?? 'ko'}
           />
         </>
       )}

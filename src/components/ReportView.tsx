@@ -1,4 +1,5 @@
 import type { NonverbalEvent, NonverbalSummary, Report, Turn } from '../lib/types'
+import { summarizeSpeech, fmtLatency, fmtCpm } from '../lib/speech-metrics'
 
 interface Props {
   title: string
@@ -12,6 +13,7 @@ interface Props {
   error?: string | null
   counterpart?: string
   hasVision?: boolean // false면 시선·자세 카드 대신 통화 요약
+  lang?: 'ko' | 'en' // 말투 측정 단위 (자/분 vs wpm)
 }
 
 export const fmtDur = (ms: number) => `${Math.floor(ms / 60000)}분 ${Math.floor((ms % 60000) / 1000)}초`
@@ -24,7 +26,8 @@ const STAGE_TEXT = {
   retrying: { step: 3, text: '첫 시도가 실패해 다시 작성하고 있습니다' },
 } as const
 
-export function ReportView({ title, durationMs, turns, events, overall: o, report, loading, loadingStage = 'saving', error, counterpart = '상대', hasVision = true }: Props) {
+export function ReportView({ title, durationMs, turns, events, overall: o, report, loading, loadingStage = 'saving', error, counterpart = '상대', hasVision = true, lang = 'ko' }: Props) {
+  const speech = summarizeSpeech(turns, lang)
   return (
     <>
       <p className="muted">{title} · {fmtDur(durationMs)} · 질문 {turns.filter((t) => t.role === 'interviewer').length}개</p>
@@ -95,6 +98,26 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
               ))}
             </div>
           ) : null}
+          {speech.userTurns > 0 && (
+            <section className="speech">
+              <h3>말투와 전달</h3>
+              {report.speechProfile && <p className="speech-profile"><span className="muted small">이 상황이 좋아하는 화법</span><br />{report.speechProfile}</p>}
+              <div className="stats speech-stats">
+                <div className="stat"><div className="num">{fmtLatency(speech.avgLatencyMs)}</div><div className="lbl">첫 반응 (평균)</div></div>
+                <div className="stat"><div className="num">{fmtCpm(speech.avgCpm, lang)}</div><div className="lbl">말 속도</div></div>
+                <div className="stat"><div className="num">{speech.avgAnswerSec !== null ? `${Math.round(speech.avgAnswerSec)}초` : `${speech.avgAnswerChars}${lang === 'en' ? '단어' : '자'}`}</div><div className="lbl">답변 길이 (평균)</div></div>
+                <div className="stat"><div className="num">{speech.fillers + speech.hedges}</div><div className="lbl">말버릇 · 완충 표현</div></div>
+              </div>
+              <p className="muted small">
+                {speech.completeRatio !== null && <>문장 끝맺음 {speech.completeRatio}% · </>}
+                단정 표현 {speech.assertives}회 · 되묻기 {speech.questions}회
+                {speech.honorificMix && ' · 존댓말·반말 혼용'}
+                {speech.timedTurns === 0 && ' · 텍스트로 답해 속도·지연은 측정되지 않았습니다'}
+                {speech.fillers > 0 && ' · 말버릇은 음성 인식이 들은 것만 셉니다'}
+              </p>
+              {report.speech && report.speech.length > 0 && <ul>{report.speech.map((t, i) => <li key={i}>{t}</li>)}</ul>}
+            </section>
+          )}
           <section>
             <h3>잘한 점</h3>
             <ul>{report.strengths.map((s, i) => <li key={i}>{s}</li>)}</ul>
@@ -111,7 +134,7 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
           </section>
           <section>
             {/* 카메라 상황은 시선·자세, 전화 상황은 코치가 어조·통화 흐름을 쓴다 */}
-            <h3>{hasVision ? '시선과 자세' : '말투와 흐름'}</h3>
+            <h3>{hasVision ? '시선과 자세' : '통화 흐름'}</h3>
             <ul>{report.nonverbal.map((s, i) => <li key={i}>{s}</li>)}</ul>
           </section>
           <section className="next">

@@ -58,9 +58,11 @@ export const REPORT_JSON = `반드시 아래 JSON만 출력한다.
   "perQuestion": [{ "question": "상대의 질문·요구 요약", "comment": "대응 평가 한두 문장" }],
   "nonverbal": ["타임라인 코멘트 1", "코멘트 2"],
   "nextTraining": "다음 훈련 제안 한 문장",
-  "scoreBreakdown": [{ "item": "평가 항목 이름 (위 평가 기준 순서대로)", "max": 항목 만점 정수, "score": 받은 점수 정수, "note": "이 점수를 준 근거 한 문장 (대화 인용 포함)" }]
+  "scoreBreakdown": [{ "item": "평가 항목 이름 (위 평가 기준 순서대로, 마지막에 '전달(말투)')", "max": 항목 만점 정수, "score": 받은 점수 정수, "note": "이 점수를 준 근거 한 문장 (대화 인용 포함)" }],
+  "speech": ["말투·전달 코멘트 1 (숫자 + 인용)", "코멘트 2"],
+  "speechProfile": "이 상황이 선호하는 화법 한 줄 (아래 말투·전달 평가 블록의 것을 그대로)"
 }
-scoreBreakdown 규칙: 위 평가 기준을 항목으로 4~6개, max의 합은 100, score의 합은 반드시 위 score와 같아야 한다. 사용자가 "왜 이 점수인가"를 눌러 보는 용도이므로 각 note는 구체적으로.`
+scoreBreakdown 규칙: 위 평가 기준을 항목으로 4~6개 + "전달(말투)" 1개, max의 합은 100, score의 합은 반드시 위 score와 같아야 한다. 사용자가 "왜 이 점수인가"를 보는 용도이므로 각 note는 구체적으로.`
 
 
 export const COMMON_RULES = `- 실제 사람이 말하듯 자연스러운 구어체. 음성으로 읽힌다. 마크다운, 목록, 괄호 지시문 금지.
