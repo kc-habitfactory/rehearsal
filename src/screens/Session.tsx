@@ -422,7 +422,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
           <div className="interviewer-card">
             <div className={`avatar ${phase === 'interviewer' ? 'talking' : ''}`}>{scenario.interviewer.name[0]}</div>
             <div>
-              <div className="muted small">{dom.counterpart} · {scenario.interviewer.name}</div>
+              <div className="muted small">{scenario.interviewer.name.startsWith(dom.counterpart) ? scenario.interviewer.name : `${dom.counterpart} · ${scenario.interviewer.name}`}</div>
               <div className="phase">
                 {phase === 'interviewer' && '말하는 중'}
                 {phase === 'listening' && (textMode ? '답변을 입력해 주세요' : dom.answerHint)}
