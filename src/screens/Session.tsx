@@ -297,6 +297,15 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
     if (interim) setDraft(interim)
   }
 
+  /** 텍스트 모드에서 음성으로 되돌린다. 내 차례면 바로 듣기 시작 */
+  function switchToVoice() {
+    if (!speechSupported()) return
+    setError(null)
+    textModeRef.current = false
+    setTextMode(false)
+    if (phaseRef.current === 'listening') startListening()
+  }
+
   function submitDraft() {
     const t = draft.trim()
     if (!t || phase !== 'listening') return
@@ -521,6 +530,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
             {phase === 'thinking' && <button className="main-action outline" disabled>상대가 생각하는 중…</button>}
             <div className="sub-actions">
               {phase === 'listening' && !textMode && <button className="link-btn" onClick={switchToText}>텍스트로 답하기</button>}
+              {textMode && speechSupported() && <button className="link-btn" onClick={switchToVoice} title="마이크로 답합니다. 음성 인식이 안 되면 다시 텍스트로 바뀝니다">음성으로 답하기</button>}
               <button className="link-btn" onClick={() => setReal(true)} title="지표·자막·기록을 숨기고 화면만 봅니다">실전 모드</button>
               <button className="link-btn danger" onClick={finish}>{endLabel}</button>
             </div>
