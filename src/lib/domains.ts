@@ -11,6 +11,7 @@ export interface FieldDef {
 export interface DomainDef {
   id: DomainId
   name: string // 탭 이름
+  icon: string // 목록·제목용 이모지
   short: string // 홈 버튼 등 짧은 명칭
   description: string
   counterpart: string // 상대 호칭 (면접관 / 발신자)
@@ -29,6 +30,7 @@ export interface DomainDef {
 export const DOMAINS: DomainDef[] = [
   {
     id: 'interview',
+    icon: '💼',
     name: '면접',
     short: '면접',
     description: 'AI 면접관과 5분 실전 면접. 2025~2026 실제 면접 질문과 꼬리질문 패턴 기반. 개발·기획·마케팅·디자인·QA 등 직군별.',
@@ -93,6 +95,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'scam_call',
+    icon: '📞',
     name: '금융사기 전화',
     short: '사기 전화 대응',
     description: '2024~2026 실제 사례를 기반으로 사기범(또는 진짜 기관)의 전화를 받아 의심하고, 정보를 지키고, 끊는 연습. 진짜 전화가 섞여 나옵니다.',
@@ -122,6 +125,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'salary_negotiation',
+    icon: '💰',
     name: '연봉 협상',
     short: '연봉 협상',
     description: '오퍼를 받은 뒤 회사 측(대표·인사담당자·채용 매니저·팀장)과 연봉을 협상합니다. 상대는 직무와 현재 연봉만 알고 있고, 희망 연봉과 경쟁 오퍼는 내가 꺼내야 하는 카드입니다. 회사의 실제 한도는 리포트에서 공개됩니다.',
@@ -152,6 +156,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'exec_qa',
+    icon: '📊',
     name: '임원 보고 Q&A',
     short: '임원 보고',
     description: '보고를 마친 직후 임원의 질의응답 5분. 결론 먼저, 숫자 근거, 플랜 B를 검증합니다.',
@@ -183,6 +188,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'hospital',
+    icon: '🏥',
     name: '병원 진료',
     short: '병원 진료',
     description: '짧은 진료 시간 안에 증상을 정확히 전달하고, 검사·약·비용·재방문 기준을 묻는 연습.',
@@ -209,6 +215,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'immigration',
+    icon: '✈️',
     name: '해외 입국 심사 (영어)',
     short: '입국 심사',
     description: 'Immigration officer와 영어로 입국 심사. 목적·기간·숙소·귀국편을 짧고 명확하게. 영국 ETA, EU EES·ETIAS 등 2025~2026 제도 반영. 리포트는 한국어로, 표현 교정 포함.',
@@ -238,6 +245,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'insurance_consult',
+    icon: '🛡️',
     name: '보험 상담 (상담사)',
     short: '보험 상담',
     description: '내가 시그널파이낸셜랩 상담사가 되어, 시그널플래너에서 상담을 신청한 고객에게 콜백 전화를 합니다. 고객은 매번 다른 숨은 사정을 갖고 있고, 2026년 실제 제도(5세대 실손, 보험료 인상, 수수료 공시)를 기준으로 정확성과 설명의무까지 평가합니다.',
@@ -267,6 +275,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'money_talk',
+    icon: '🤝',
     name: '지인과 돈 이야기',
     short: '돈 이야기',
     description: '지인이 돈을 빌려달라고 할 때 관계를 지키며 거절하거나, 반대로 내가 예의 있게 부탁하는 연습. 상대는 급함·죄책감·금액 낮추기 같은 실제 압박 패턴을 쓰고, 셋 중 하나는 사정이 진짜인 정상 부탁이라 판단력도 함께 봅니다.',
@@ -294,6 +303,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'parent_teacher',
+    icon: '🏫',
     name: '학부모 상담',
     short: '학부모 상담',
     description: '자녀 문제(따돌림 의심, 성적 하락, 생활지도, 교우관계, 과목 선택)로 담임교사와 15분 면담합니다. 담임은 내가 모르는 관찰 사실을 갖고 있고, 학교폭력 절차·생활지도 고시·2026 스마트폰 금지법·고교학점제 같은 최신 제도를 정확히 안내합니다.',
@@ -321,6 +331,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'claim_appeal',
+    icon: '📄',
     name: '실손 청구 거절 이의신청',
     short: '청구 이의',
     description: '보험사가 거절한 실손 청구 건으로 보상 담당자에게 전화해 이의를 제기합니다. 서면 사유·약관 조항 요구, 소견서 재심사, 의료자문 대응(제3의료기관 동시감정), 손해사정사 선임권, 금감원 민원까지 2025~26 실제 절차와 통계 기반. 부지급이 정당한 건도 섞여 있어 판단력도 봅니다.',
@@ -348,6 +359,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'hiring_interviewer',
+    icon: '🧑‍💼',
     name: '면접관 (기업용)',
     short: '면접관',
     description: '내가 면접관이 되어 AI 지원자를 면접합니다. 지원자는 과장·준비·장황·긴장·전환·시니어 유형 중 하나이고 이력서에 검증해야 할 과장 항목이 숨어 있습니다. 구조화 질문, 꼬리질문 검증, 채용절차법·인권위 금지 질문, 후보자 경험(면접 경험이 기업 이미지에 영향 93%)을 평가하고 지원자가 남길 가상 후기까지 보여 줍니다.',
@@ -379,6 +391,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'meeting_prep',
+    icon: '📋',
     name: '회의 입장 점검',
     short: '회의 점검',
     description: '회의 5분 전, 진행자(PM)가 기획 문서에서 뽑은 5문항을 하나씩 묻고 회의에 들어갈 준비가 됐는지 판정합니다. 기획 문서를 붙이면 그 문서의 목적·현행·결정 사항·미확인 항목·내 역할 문항이 나오고, 리포트에 입장 판정과 다시 읽을 절, 회의에서 내가 물어야 할 질문 2개가 나옵니다. 카메라 없음.',
@@ -406,6 +419,7 @@ export const DOMAINS: DomainDef[] = [
   },
   {
     id: 'customer_interview',
+    icon: '🎤',
     name: '고객 인터뷰 진행',
     short: '고객 인터뷰',
     description: '내가 인터뷰어가 되어 AI 고객을 인터뷰합니다. 고객은 표면 답("바빠서요")과 진짜 이유가 다르고, 감정 단어를 한 번 흘리고, 가이드에 없는 니즈를 숨기고 있습니다. 유도·닫힌 질문엔 예의상 동의나 단답만 합니다. The Mom Test 기준으로 질문 품질·구체화·감정 신호·경청·인사이트를 평가하고 다음 가이드 질문을 제안합니다.',
