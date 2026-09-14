@@ -388,7 +388,7 @@ export const DOMAINS: DomainDef[] = [
     usesCamera: false,
     callMode: 'desk',
     fields: [
-      { key: 'meeting', label: '회의 이름·목적', placeholder: '예: USA-1140 Property Insights 변경 기획 리뷰' },
+      { key: 'meeting', label: '회의 이름·목적', placeholder: '예: 제품 개발 기획 리뷰 / 신규 기능 킥오프' },
       { key: 'role', label: '내 역할', placeholder: '기획 / 프론트엔드 / 백엔드 / QA / 디자인' },
       { key: 'type', label: '회의 유형', placeholder: '킥오프 / 기획 리뷰 / 개발 착수 / QA 전 점검' },
     ],
@@ -396,12 +396,12 @@ export const DOMAINS: DomainDef[] = [
       { key: 'spec', label: '기획 문서 (붙여넣기 · 선택)', hint: '노션 기획서 본문을 복사해 붙이거나 PDF·TXT를 놓으세요. 문서에 실제로 있는 내용만 묻고, 원문은 저장하지 않습니다. 비우면 회의 이름·유형으로 일반 준비 문항을 만듭니다.' },
     ],
     presets: [
-      { meeting: 'USA-1140 Apply Step4 Property Insights 변경 기획 리뷰', role: '백엔드', type: '기획 리뷰' },
-      { meeting: 'USA-1140 Apply Step4 Property Insights 변경 기획 리뷰', role: '프론트엔드', type: '개발 착수' },
-      { meeting: 'USA-1140 Apply Step4 Property Insights 변경', role: 'QA', type: 'QA 전 점검' },
+      { meeting: '제품 개발 기획 리뷰', role: '백엔드', type: '기획 리뷰' },
+      { meeting: '신규 기능 개발 착수 회의', role: '프론트엔드', type: '개발 착수' },
+      { meeting: '배포 전 QA 점검 회의', role: 'QA', type: 'QA 전 점검' },
       { meeting: '시그널플래너 상담 신청 흐름 개편 킥오프', role: '기획', type: '킥오프' },
       { meeting: '5세대 실손 전환 안내 배너 기획 리뷰', role: '디자인', type: '기획 리뷰' },
-      { meeting: '주간 스프린트 리뷰 (다이렉트 도메인)', role: '백엔드', type: '스프린트 리뷰' },
+      { meeting: '주간 스프린트 리뷰', role: '백엔드', type: '스프린트 리뷰' },
     ],
   },
 ]
