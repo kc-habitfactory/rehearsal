@@ -198,6 +198,13 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .badge.parent_teacher { background: rgba(250,177,160,.18); color: #fab1a0; }
 .badge.claim_appeal { background: rgba(129,236,236,.18); color: #81ecec; }
 .badge.hiring_interviewer { background: rgba(162,155,254,.18); color: #a29bfe; }
+.badge.meeting_prep { background: rgba(255,234,167,.18); color: #ffeaa7; }
+/* 회의 입장 판정 */
+.verdict { margin: 20px 0 -8px; padding: 14px 18px; border-radius: 14px; border: 1px solid; font-size: 17px; }
+.verdict.pass { border-color: rgba(46,204,113,.6); background: rgba(46,204,113,.1); }
+.verdict.fail { border-color: rgba(255,193,7,.6); background: rgba(255,193,7,.1); }
+.verdict .verdict-label b { font-size: 20px; }
+.verdict .muted.small { margin-top: 4px; }
 .badge.real { background: rgba(232,234,240,.12); color: var(--text); border: 1px solid var(--line); margin-left: 6px; }
 
 /* 준비 화면: 실전 모드 토글 */

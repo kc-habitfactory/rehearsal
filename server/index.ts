@@ -56,9 +56,12 @@ function setupHash(domainId: string, input: string) {
   return createHash('sha1').update(`${SCENARIO_MODEL}|${domainId}|${input}`).digest('hex').slice(0, 16)
 }
 
+/** 긴 문서(공고·이력서·기획 문서)가 붙은 요청인지. 매번 고유하므로 풀을 채우지 않고 출력 토큰도 넉넉히 */
+const hasDocs = (f: Record<string, string>) => ['jd', 'resume', 'spec'].some((k) => (f[k] ?? '').trim().length > 0)
+
 async function generateScenario(domainId: string, input: string, fields: Record<string, string> = {}) {
   // 공고·이력서가 붙으면 요약·요구사항·커버리지 계획까지 나와 출력이 길다. 1500이면 잘려서 opening이 사라진다
-  const long = Boolean(fields.jd?.trim() || fields.resume?.trim())
+  const long = hasDocs(fields)
   const msg = await client!.messages.create({
     model: SCENARIO_MODEL,
     max_tokens: long ? 4000 : 2000,
@@ -137,7 +140,7 @@ app.post('/api/scenario', async (req, res) => {
       push('done')
     }
     // 공고·이력서가 붙은 요청은 매번 고유하므로 풀을 미리 채우지 않는다 (opus 호출 낭비)
-    if (!fields.jd?.trim() && !fields.resume?.trim()) void refillPool(hash, dom.id, input, fields, userKey)
+    if (!hasDocs(fields)) void refillPool(hash, dom.id, input, fields, userKey)
   } catch (e) {
     console.error(e)
     push('failed')

@@ -68,4 +68,6 @@ export interface Report {
   speechProfile?: string // 이 상황이 선호하는 화법 한 줄
   coverage?: { requirement: string; status: '증명' | '부분' | '미답' | '확인' | '미확인'; note: string }[] // 공고 요구사항 대비 (공고를 넣은 면접·면접관)
   candidateReview?: string // 면접관 훈련: 지원자가 남길 법한 가상 후기
+  verdict?: { pass: boolean; label: string; reread: string[] } // 회의 입장 점검: 판정과 다시 읽을 절
+  questionsToAsk?: string[] // 회의 입장 점검: 회의에서 물어야 할 질문
 }

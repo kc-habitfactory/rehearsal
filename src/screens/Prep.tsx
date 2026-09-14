@@ -162,11 +162,12 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
     parent_teacher: ['담임의 관찰 사실을 정하는 중', '안내할 절차를 맞추는 중', '담임 성향을 정하는 중', '돌발 변수를 심는 중', '첫 인사를 다듬는 중'],
     claim_appeal: ['부지급이 정당한지 애매한지 정하는 중', '약관 근거와 인정 범위를 정하는 중', '담당자 전술 순서를 짜는 중', '돌발 변수를 심는 중', '콜센터 첫 인사를 다듬는 중'],
     hiring_interviewer: ['지원자 유형을 정하는 중', '이력서에 과장 항목을 심는 중', '질문 유형별 반응 규칙을 짜는 중', '역질문을 준비하는 중', '첫 인사를 다듬는 중'],
+    meeting_prep: ['문서에서 목적·결정 사항을 뽑는 중', '역할에 맞는 문항을 고르는 중', '정답 요지와 채점 기준을 적는 중', '되묻기 규칙을 정하는 중', '첫 문항을 다듬는 중'],
   }
   const stageMsgs = STAGES[dom.id] ?? STAGES.interview
   const timedMsg = stageMsgs[Math.min(stageMsgs.length - 1, Math.floor(scenarioElapsed / 4))]
   const stageMsg = serverStage === 'pool_hit' ? '미리 만들어 둔 시나리오를 꺼내는 중' : serverStage === 'generating' ? `AI가 새 시나리오를 만드는 중 · ${timedMsg}` : timedMsg
-  const expected = dom.id === 'scam_call' || dom.id === 'insurance_consult' || dom.id === 'claim_appeal' ? '보통 15~25초' : '보통 8~15초'
+  const expected = dom.id === 'scam_call' || dom.id === 'insurance_consult' || dom.id === 'claim_appeal' || dom.id === 'meeting_prep' ? '보통 15~25초' : '보통 8~15초'
   // 판별 훈련 도메인은 제목이 답을 드러내므로 시작 전에는 숨긴다
   const scenarioLabel = scenario
     ? dom.hideTitleBeforeStart ? `시나리오 준비 완료 · 내용은 ${dom.startLabel} 후 확인하세요` : `시나리오 · ${scenario.title}`
@@ -221,7 +222,7 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
       {scenario && !visionSettled && <p className="muted small">시나리오는 준비됐습니다. 시선 보정이 끝나면 시작할 수 있어요.</p>}
       {scenario && serverStage === 'pool_refilled' && <p className="muted small">다음 훈련용 시나리오도 미리 준비해 두었습니다. 같은 설정이면 바로 시작됩니다.</p>}
       {textOnly && <p className="muted small">음성 입력이 불가능해 답변은 텍스트로 입력하게 됩니다. {dom.counterpart} 음성은 그대로 나옵니다.</p>}
-      {!dom.usesCamera && <p className="muted small">전화 상황이라 카메라를 쓰지 않습니다. 목소리와 말한 내용으로만 평가합니다.</p>}
+      {!dom.usesCamera && <p className="muted small">{dom.callMode === 'desk' ? '책상에서 하는 점검이라 카메라를 쓰지 않습니다. 답한 내용으로만 평가합니다.' : '전화 상황이라 카메라를 쓰지 않습니다. 목소리와 말한 내용으로만 평가합니다.'}</p>}
       {dom.lang === 'en' && <p className="muted small">영어로 진행됩니다. 음성 인식도 영어로 설정됩니다. 리포트는 한국어로 나옵니다.</p>}
       <label className="real-toggle">
         <input type="checkbox" checked={realMode} onChange={(e) => toggleReal(e.target.checked)} />

@@ -31,12 +31,14 @@ export async function findSessionByClientId(userKey: string, clientId: string): 
 
 /** 이력서·공고 원문은 기록에 남기지 않는다 (개인정보). 길이만 표시로 남기고, 요약은 scenario.resumeSummary 에 있다.
  *  setup.fields 와 scenario.fields(서버가 시나리오 응답에 붙여 준 입력값) 둘 다 적용 */
+const DOC_KEYS: Record<string, string> = { jd: '채용 공고', resume: '이력서', spec: '기획 문서' }
 function stripDocs<T extends { fields?: Record<string, string> } | undefined>(obj: T): T {
   const f = obj?.fields
-  if (!obj || !f || (!f.jd && !f.resume)) return obj
+  if (!obj || !f || !Object.keys(DOC_KEYS).some((k) => f[k])) return obj
   const fields = { ...f }
-  if (fields.jd) fields.jd = `[채용 공고 ${String(fields.jd).replace(/\s/g, '').length}자 제공됨 · 원문 미저장]`
-  if (fields.resume) fields.resume = `[이력서 ${String(fields.resume).replace(/\s/g, '').length}자 제공됨 · 원문 미저장]`
+  for (const [k, label] of Object.entries(DOC_KEYS)) {
+    if (fields[k]) fields[k] = `[${label} ${String(fields[k]).replace(/\s/g, '').length}자 제공됨 · 원문 미저장]`
+  }
   return { ...obj, fields }
 }
 

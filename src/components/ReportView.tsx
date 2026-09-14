@@ -42,7 +42,7 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
       ) : (
         <div className="stats stats-2">
           <div className="stat"><div className="num">{turns.filter((t) => t.role === 'user').length}</div><div className="lbl">내 발화</div></div>
-          <div className="stat"><div className="num">{fmtDur(durationMs)}</div><div className="lbl">통화 시간</div></div>
+          <div className="stat"><div className="num">{fmtDur(durationMs)}</div><div className="lbl">진행 시간</div></div>
         </div>
       )}
 
@@ -76,6 +76,12 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
 
       {report && (
         <>
+          {report.verdict && (
+            <div className={`verdict ${report.verdict.pass ? 'pass' : 'fail'}`}>
+              <div className="verdict-label">{report.verdict.pass ? '✓' : '!'} 회의 입장 판정 · <b>{report.verdict.label}</b></div>
+              {report.verdict.reread?.length > 0 && <div className="muted small">다시 읽을 곳: {report.verdict.reread.join(' · ')}</div>}
+            </div>
+          )}
           <div className={`score-card ${report.scoreBreakdown?.length ? 'with-breakdown' : ''}`}>
             <div className="score-wrap">
               <div className="score">{report.score}</div>
@@ -131,6 +137,12 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
               </div>
             </section>
           )}
+          {report.questionsToAsk && report.questionsToAsk.length > 0 && (
+            <section>
+              <h3>회의에서 당신이 물어야 할 질문</h3>
+              <ul>{report.questionsToAsk.map((q, i) => <li key={i}>{q}</li>)}</ul>
+            </section>
+          )}
           {report.candidateReview && (
             <section className="review">
               <h3>지원자가 남길 법한 후기 (가상)</h3>
@@ -153,7 +165,7 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
           </section>
           <section>
             {/* 카메라 상황은 시선·자세, 전화 상황은 코치가 어조·통화 흐름을 쓴다 */}
-            <h3>{hasVision ? '시선과 자세' : '통화 흐름'}</h3>
+            <h3>{hasVision ? '시선과 자세' : '대화 흐름'}</h3>
             <ul>{report.nonverbal.map((s, i) => <li key={i}>{s}</li>)}</ul>
           </section>
           <section className="next">

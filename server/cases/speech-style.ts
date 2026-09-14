@@ -100,6 +100,12 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['질문이 길거나 두 개를 한 번에', '답변 도중 끊기', '사적·차별 소지 질문', '면접관 발화 비율 30% 초과', '평가·판단어를 면접 중에 말함("좋네요/약하네요")'],
     cpm: [250, 350], answerSec: [3, 20], latencySec: [0.5, 3],
   },
+  briefing: {
+    key: 'briefing', name: '점검 답변형: 결론 먼저, 문서의 절·용어로, 모르면 "확인 못 했습니다"',
+    likes: ['첫 문장에 답의 핵심', '문서의 절 이름·용어 그대로', '두 가지를 물으면 "첫째… 둘째…"', '모르는 건 지어내지 않고 인정'],
+    dislikes: ['배경 설명부터 시작', '"아마… 같습니다" 추측', '문서에 없는 내용을 확신 있게', '질문 하나에 30초 이상'],
+    cpm: [280, 380], answerSec: [5, 30], latencySec: [0.5, 4],
+  },
   consultant: {
     key: 'consultant', name: '상담사형: 쉬운 말로 한 번에 하나씩, 단정하지 않고, 제안 뒤 침묵을 견디기',
     likes: ['고객 상황을 먼저 묻고 되짚기("~하신 거죠?")', '전문용어는 비유·예시로, 한 번에 한 가지', '"고객님 상황에서는 ~한 경우 유리합니다"처럼 조건부 표현', '핵심 제안 뒤 3~5초 침묵, 결정 재촉 금지', '거절에는 압박 대신 "한두 달 뒤 안부 겸 연락" 수준의 후속 약속'],
@@ -135,6 +141,7 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
     case 'parent_teacher': return P.parent
     case 'claim_appeal': return P.claimant
     case 'hiring_interviewer': return P.interviewer
+    case 'meeting_prep': return P.briefing
     default: return P.general
   }
 }

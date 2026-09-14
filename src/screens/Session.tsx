@@ -348,7 +348,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
 
   const mm = String(Math.floor(elapsed / 60000)).padStart(2, '0')
   const ss = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0')
-  const endLabel = dom.id === 'scam_call' || dom.id === 'claim_appeal' ? '전화 끊기' : dom.id === 'insurance_consult' ? '상담 마치기' : dom.id === 'hospital' ? '진료 끝' : dom.id === 'money_talk' ? '대화 마치기' : dom.id === 'parent_teacher' ? '면담 마치기' : dom.id === 'hiring_interviewer' ? '면접 마치기' : '종료'
+  const endLabel = dom.id === 'scam_call' || dom.id === 'claim_appeal' ? '전화 끊기' : dom.id === 'insurance_consult' ? '상담 마치기' : dom.id === 'hospital' ? '진료 끝' : dom.id === 'money_talk' ? '대화 마치기' : dom.id === 'parent_teacher' ? '면담 마치기' : dom.id === 'hiring_interviewer' ? '면접 마치기' : dom.id === 'meeting_prep' ? '점검 마치기' : '종료'
   const statusText = phase === 'interviewer' ? '말하는 중' : phase === 'listening' ? (textMode ? '답변을 입력해 주세요' : '내 차례') : phase === 'thinking' ? '…' : '종료'
 
   // 실전 모드에서 화면(카메라/통화) 위에 얹는 것들: 렌즈 아래 상대 표시, 카운트다운, 종료 확인, 최소 조작
@@ -401,7 +401,7 @@ export function Session({ setup, scenario, engine, stream, onFinish }: Props) {
             <div className={`call-avatar ${phase === 'interviewer' ? 'talking' : ''}`}>{scenario.interviewer.name[0]}</div>
             <div className="call-name">{scenario.interviewer.name}</div>
             <div className="call-status">
-              {phase === 'done' ? '통화 종료' : `통화 중 ${mm}:${ss}`}
+              {phase === 'done' ? (dom.callMode === 'desk' ? '점검 종료' : '통화 종료') : `${dom.callMode === 'desk' ? '점검 중' : '통화 중'} ${mm}:${ss}`}
             </div>
             <div className="call-wave">{phase === 'interviewer' ? '상대가 말하는 중' : phase === 'listening' ? (textMode ? '답변 입력 대기' : '내 차례') : phase === 'thinking' ? '…' : ''}</div>
             {realOverlays}

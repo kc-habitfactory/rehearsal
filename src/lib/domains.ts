@@ -1,6 +1,6 @@
 /* 훈련 도메인 정의 (클라이언트). 서버의 server/domains.ts와 id를 맞춘다. */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher' | 'claim_appeal' | 'hiring_interviewer'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher' | 'claim_appeal' | 'hiring_interviewer' | 'meeting_prep'
 
 export interface FieldDef {
   key: string
@@ -19,6 +19,7 @@ export interface DomainDef {
   usesCamera: boolean // false면 카메라를 요청하지 않고 통화 화면으로 진행 (전화 상황)
   lang?: 'ko' | 'en' // 대화 언어. 음성 인식·합성에 반영. 기본 ko
   hideTitleBeforeStart?: boolean // 준비 화면에서 제목을 숨김 (판별 훈련)
+  callMode?: 'phone' | 'desk' // usesCamera false 일 때 화면 표기: 전화(통화 중) 또는 책상 점검(점검 중). 기본 phone
   fields: FieldDef[]
   presets: Record<string, string>[]
   /** 긴 문서 입력(선택). 붙여넣기 또는 PDF·TXT 드롭. 브라우저에서 텍스트만 추출해 fields[key]로 보낸다 */
@@ -374,6 +375,33 @@ export const DOMAINS: DomainDef[] = [
       { role: '보험 상담사 (신입)', company: '시그널파이낸셜랩(핀랩)', candidate: '무경력 신입, 서비스업 출신', competencies: '학습 태도, 고객 응대, 성실성' },
       { role: 'QA 엔지니어', company: '게임 회사', candidate: '경력 2년, 긴장이 심한 유형', competencies: '꼼꼼함, 재현·보고 능력, 협업' },
       { role: 'AI·LLM 엔지니어', company: 'AI 스타트업', candidate: '경력 4년, 프레임워크 이름을 많이 나열하는 유형', competencies: '평가·검증 방법, 비용 관리, 실패 경험' },
+    ],
+  },
+  {
+    id: 'meeting_prep',
+    name: '회의 입장 점검',
+    short: '회의 점검',
+    description: '회의 5분 전, 진행자(PM)가 기획 문서에서 뽑은 5문항을 하나씩 묻고 회의에 들어갈 준비가 됐는지 판정합니다. 기획 문서를 붙이면 그 문서의 목적·현행·결정 사항·미확인 항목·내 역할 문항이 나오고, 리포트에 입장 판정과 다시 읽을 절, 회의에서 내가 물어야 할 질문 2개가 나옵니다. 카메라 없음.',
+    counterpart: '회의 진행자',
+    startLabel: '점검 시작',
+    answerHint: '진행자가 듣고 있습니다. 답하세요',
+    usesCamera: false,
+    callMode: 'desk',
+    fields: [
+      { key: 'meeting', label: '회의 이름·목적', placeholder: '예: USA-1140 Property Insights 변경 기획 리뷰' },
+      { key: 'role', label: '내 역할', placeholder: '기획 / 프론트엔드 / 백엔드 / QA / 디자인' },
+      { key: 'type', label: '회의 유형', placeholder: '킥오프 / 기획 리뷰 / 개발 착수 / QA 전 점검' },
+    ],
+    docs: [
+      { key: 'spec', label: '기획 문서 (붙여넣기 · 선택)', hint: '노션 기획서 본문을 복사해 붙이거나 PDF·TXT를 놓으세요. 문서에 실제로 있는 내용만 묻고, 원문은 저장하지 않습니다. 비우면 회의 이름·유형으로 일반 준비 문항을 만듭니다.' },
+    ],
+    presets: [
+      { meeting: 'USA-1140 Apply Step4 Property Insights 변경 기획 리뷰', role: '백엔드', type: '기획 리뷰' },
+      { meeting: 'USA-1140 Apply Step4 Property Insights 변경 기획 리뷰', role: '프론트엔드', type: '개발 착수' },
+      { meeting: 'USA-1140 Apply Step4 Property Insights 변경', role: 'QA', type: 'QA 전 점검' },
+      { meeting: '시그널플래너 상담 신청 흐름 개편 킥오프', role: '기획', type: '킥오프' },
+      { meeting: '5세대 실손 전환 안내 배너 기획 리뷰', role: '디자인', type: '기획 리뷰' },
+      { meeting: '주간 스프린트 리뷰 (다이렉트 도메인)', role: '백엔드', type: '스프린트 리뷰' },
     ],
   },
 ]
