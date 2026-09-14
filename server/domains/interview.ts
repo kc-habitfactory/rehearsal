@@ -1,6 +1,7 @@
 /* 1. 면접. 클라이언트 src/lib/domains.ts 의 id와 맞춘다. 공용 타입·상수는 ./shared, 지식베이스는 ../cases */
 import { type DomainPrompts, REPORT_JSON, knownFacts } from './shared'
 import { interviewBriefForDesigner, interviewBriefForCoach } from '../cases/interview'
+import { isFinlabHiring, FINLAB_RP_FOR_DESIGNER, FINLAB_RP_FOR_COACH } from '../cases/finlab-hiring'
 
 export const interview: DomainPrompts = {
   id: 'interview',
@@ -35,6 +36,7 @@ ${(f.jd ?? '').trim() || (f.resume ?? '').trim() ? `
 }
 매번 다른 성향과 돌발 변수를 고른다.
 
+${isFinlabHiring(f) ? FINLAB_RP_FOR_DESIGNER : ''}
 ${interviewBriefForDesigner(`${f.role ?? ''} ${f.company ?? ''} ${f.stage ?? ''} ${(f.jd ?? '').slice(0, 300)}`)}`,
   counterpartSystem: (s) => `당신은 "${s.title}"의 면접관 ${s.interviewer.name}이다. 성향: ${s.interviewer.style}.
 내부 계획(지원자에게 절대 노출 금지): ${s.hiddenPlan}
@@ -56,6 +58,7 @@ ${s.jdRequirements?.length ? `공고 요구사항(내부 계획의 커버리지 
 - 비언어는 관찰 사실과 타임라인으로 말한다. 예: "1분 40초, 반박을 받은 직후 시선이 5초간 아래로 내려갔습니다." 성격이나 감정을 단정하지 않는다("긴장한 것처럼 보일 수 있습니다" 수준까지만).
 - 다음 훈련 제안은 한 가지, 실행 가능한 것으로. 이번에 약했던 꼬리질문 유형을 지정해 준다.
 ${log?.scenario?.jdRequirements?.length ? `- [공고 커버리지] 아래 공고 요구사항마다 지원자가 답변으로 증명했는지 판정해 JSON에 "coverage": [{ "requirement": "요구사항", "status": "증명" | "부분" | "미답", "note": "근거 한 문장(인용)" }] 배열을 추가한다. "미답"은 면접관이 묻지 않았거나 지원자가 비켜간 것 모두 포함. nextTraining은 "미답"·"부분" 중 하나를 지정한다.\n공고 요구사항: ${log.scenario.jdRequirements.join(' / ')}${log?.scenario?.resumeSummary ? `\n이력서 요약: ${log.scenario.resumeSummary}` : ''}` : ''}
+${isFinlabHiring(log?.setup?.fields) ? FINLAB_RP_FOR_COACH : ''}
 ${interviewBriefForCoach(`${log?.setup?.fields?.role ?? ''} ${log?.scenario?.title ?? ''}`)}
 ${REPORT_JSON}`,
   mockScenario: (f) => ({

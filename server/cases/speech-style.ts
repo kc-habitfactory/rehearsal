@@ -70,6 +70,12 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['"어… 네…" 망설임, 상대 페이스에 끌려가는 단답 "네", "아니요"', '정보 조각(은행명·가족 유무) 흘리기', '길게 사정 설명하며 설득 시도'],
     cpm: [300, 420], answerSec: [2, 15], latencySec: [0.3, 2.5],
   },
+  finlabRp: {
+    key: 'finlabRp', name: '핀랩 RP 테스트형: 결론(유지·조정·해지) 먼저, 고객 언어로, 2분 안에',
+    likes: ['첫 30초에 유지/조정/해지 결론과 이유', '무해지·갱신·알릴의무를 비유·예시로', '해지 권유엔 환급금·보장 공백·알릴의무·면책 재시작 고지', '모르면 "확인 후 안내드리겠습니다"'],
+    dislikes: ['특약 나열로 시작', '"무조건·확정" 단정', '고객 질문에 침묵·"어…"', '2분을 넘기는 장황한 분석'],
+    cpm: [280, 380], answerSec: [30, 120], latencySec: [0.5, 3],
+  },
   consultant: {
     key: 'consultant', name: '상담사형: 쉬운 말로 한 번에 하나씩, 단정하지 않고, 제안 뒤 침묵을 견디기',
     likes: ['고객 상황을 먼저 묻고 되짚기("~하신 거죠?")', '전문용어는 비유·예시로, 한 번에 한 가지', '"고객님 상황에서는 ~한 경우 유리합니다"처럼 조건부 표현', '핵심 제안 뒤 3~5초 침묵, 결정 재촉 금지', '거절에는 압박 대신 "한두 달 뒤 안부 겸 연락" 수준의 후속 약속'],
@@ -87,7 +93,8 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
   const f = fields ?? {}
   switch (domainId) {
     case 'interview': {
-      const c = `${f.company ?? ''} ${f.role ?? ''}`
+      const c = `${f.company ?? ''} ${f.role ?? ''} ${f.stage ?? ''}`
+      if (/핀랩|시그널파이낸셜랩/.test(c) && /상담사|설계사|RP/.test(c)) return P.finlabRp
       // 스타트업 단서(해빗팩토리·토스·핀테크 스타트업 등)를 먼저 본다. "핀테크"만으로는 금융권으로 보지 않는다
       if (STARTUP.test(c)) return P.startup
       if (FIN.test(c)) return P.finance
