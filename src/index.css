@@ -262,6 +262,10 @@ button.danger { border-color: var(--warn); color: var(--warn); }
 .chip:hover { color: var(--text); border-color: var(--accent); }
 .chip.active { color: var(--text); border-color: var(--accent); background: rgba(108,92,231,.16); }
 .chip .star { color: #ffc107; margin-right: 4px; font-size: 11px; }
+.chip .chip-main { color: inherit; }
+.chip .chip-sub { color: var(--muted); font-size: 12px; margin-left: 6px; opacity: .85; }
+.chip.active .chip-main { color: var(--text); }
+.chip.internal { border-color: rgba(255,193,7,.35); }
 @media (max-width: 640px) {
   .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
   .chip { flex: none; white-space: nowrap; }

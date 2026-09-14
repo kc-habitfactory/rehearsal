@@ -52,14 +52,17 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
     if (dom.presets.length > 1 && i === presetIdx) i = (i + 1) % dom.presets.length // 같은 것 연속 방지
     applyPreset(i)
   }
-  // 칩 라벨: 예시의 앞 두 칸을 "직무 · 회사"처럼 붙인다. 사내 케이스(해빗팩토리·핀랩)는 ★
+  // 칩 라벨: 첫 칸은 온전히(최대 40자), 둘째 칸은 작은 보조 텍스트로. 사내 케이스(해빗팩토리·핀랩)는 ★ 를 붙이고 맨 앞에 정렬
   const INTERNAL = /해빗팩토리|시그널플래너|핀랩|시그널파이낸셜랩/
   const chipLabel = (p: Record<string, string>) => {
     const vals = dom.fields.map((f) => (p[f.key] ?? '').trim()).filter(Boolean)
-    const cut = (v: string) => (v.length > 22 ? v.slice(0, 21) + '…' : v)
-    return vals.slice(0, 2).map(cut).join(' · ')
+    const main = vals[0] ?? ''
+    const sub = vals[1] ?? ''
+    // 잘린 듯 보이지 않게: 첫 칸은 그대로(아주 길면 40자), 둘째 칸은 14자 이하일 때만 붙이고 아니면 툴팁에만
+    return { main: main.length > 40 ? main.slice(0, 39) + '…' : main, sub: sub.length <= 14 ? sub : '' }
   }
   const isInternal = (p: Record<string, string>) => Object.values(p).some((v) => INTERNAL.test(v))
+  const presetOrder = dom.presets.map((_, i) => i).sort((a, b) => Number(isInternal(dom.presets[b])) - Number(isInternal(dom.presets[a])) || a - b)
   // 선택된 칩 강조는 칸 값이 예시와 같을 때만 (고치면 풀림)
   const chipActive = (i: number) => presetIdx === i && dom.fields.every((f) => (fields[f.key] ?? '').trim() === (dom.presets[i][f.key] ?? '').trim())
   const [docStatus, setDocStatus] = useState<Record<string, string>>({})
@@ -108,11 +111,13 @@ export function Setup({ onNext, onBack }: { onNext: (s: SetupInput) => void; onB
           <button type="button" className="ghost small" onClick={random} title="예시 중 하나를 무작위로 채웁니다"><span aria-hidden>🎲</span> 랜덤</button>
         </div>
         <div className="chips">
-          {dom.presets.map((p, i) => (
+          {presetOrder.map((i) => { const p = dom.presets[i]; const l = chipLabel(p); return (
             <button key={i} type="button" className={`chip ${chipActive(i) ? 'active' : ''} ${isInternal(p) ? 'internal' : ''}`} onClick={() => applyPreset(i)} title={dom.fields.map((f) => `${f.label.replace(/\s*\(.*$/, '')}: ${p[f.key] ?? ''}`).join('\n')}>
-              {isInternal(p) && <span className="star" aria-label="사내 케이스">★</span>}{chipLabel(p)}
+              {isInternal(p) && <span className="star" aria-label="사내 케이스">★</span>}
+              <span className="chip-main">{l.main}</span>
+              {l.sub && <span className="chip-sub">{l.sub}</span>}
             </button>
-          ))}
+          ) })}
         </div>
       </div>
 
