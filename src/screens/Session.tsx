@@ -36,6 +36,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
   const [resumed] = useState(Boolean(resume))
   const isPhone = !dom.usesCamera && dom.callMode !== 'desk' // 전화 상황: 첫 대사 전에 신호음
   const [ringing, setRinging] = useState(false)
+  const speechRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<Ring | null>(null)
 
   const [live, setLive] = useState<LiveState | null>(null)
@@ -76,6 +77,13 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
   const confirmEndRef = useRef(false)
   const setConfirmEnd = (v: boolean) => { confirmEndRef.current = v; setConfirmEndState(v) }
 
+  // 상대 말이 길어져 영역을 넘치면 스트리밍 중에는 끝(지금 읽는 문장)을 따라가고, 다 끝나면 처음으로 돌린다
+  useEffect(() => {
+    const el = speechRef.current
+    if (!el) return
+    if (phase === 'interviewer') el.scrollTop = el.scrollHeight
+    else el.scrollTop = 0
+  }, [current, phase])
   const turnsRef = useRef<Turn[]>([])
   const startRef = useRef(0)
   const stopListenRef = useRef<(() => void) | null>(null)
@@ -476,7 +484,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
           </div>
 
           {resumed && <div className="resume-note">화면이 새로 고쳐져 이어서 진행합니다. 마지막 질문에 답해 주세요.</div>}
-          <div className="speech">{current || '…'}</div>
+          <div className="speech" ref={speechRef}>{current || '…'}</div>
 
           {phase === 'listening' && !textMode && (
             <div className={`you-line ${interim ? '' : 'empty'}`}>
