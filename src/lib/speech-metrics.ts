@@ -3,7 +3,7 @@
 
 export interface TurnTiming {
   latencyMs?: number // 상대 말이 끝난 뒤(듣기 시작) 내가 첫 소리를 낼 때까지
-  speakMs?: number // 첫 소리부터 발화 확정까지
+  speakMs?: number // 첫 소리부터 마지막 인식 갱신까지 (침묵 대기 제외)
   textMode?: boolean // 텍스트로 답한 턴: 시간 지표 제외
 }
 
@@ -17,6 +17,7 @@ export interface SpeechTurnLike {
 export interface SpeechSummary {
   userTurns: number
   timedTurns: number // 음성으로 답해 시간 지표가 있는 턴 수
+  cpmTurns: number // 말 속도 계산에 들어간 발화 수 (12자·2초 이상)
   avgLatencyMs: number | null
   maxLatencyMs: number | null
   maxLatencyTurn: number | null // 1부터 세는 내 발화 번호
@@ -58,7 +59,7 @@ function count(text: string, re: RegExp, out?: string[]): number {
 export function summarizeSpeech(turns: SpeechTurnLike[], lang: 'ko' | 'en' = 'ko'): SpeechSummary {
   const users = turns.filter((t) => t.role === 'user')
   const s: SpeechSummary = {
-    userTurns: users.length, timedTurns: 0,
+    userTurns: users.length, timedTurns: 0, cpmTurns: 0,
     avgLatencyMs: null, maxLatencyMs: null, maxLatencyTurn: null,
     avgCpm: null, avgAnswerChars: 0, maxAnswerChars: 0, avgAnswerSec: null, maxAnswerSec: null, maxAnswerTurn: null,
     fillers: 0, fillerExamples: [], hedges: 0, hedgeExamples: [], assertives: 0, assertiveExamples: [],
@@ -78,12 +79,14 @@ export function summarizeSpeech(turns: SpeechTurnLike[], lang: 'ko' | 'en' = 'ko
         lat.push(tm.latencyMs)
         if (s.maxLatencyMs === null || tm.latencyMs > s.maxLatencyMs) { s.maxLatencyMs = tm.latencyMs; s.maxLatencyTurn = i + 1 }
       }
-      if (typeof tm.speakMs === 'number' && tm.speakMs >= 1500) {
+      if (typeof tm.speakMs === 'number' && tm.speakMs >= 800) {
         s.timedTurns++
         const sec = tm.speakMs / 1000
         secs.push(sec)
         if (s.maxAnswerSec === null || sec > s.maxAnswerSec) { s.maxAnswerSec = sec; s.maxAnswerTurn = i + 1 }
-        if (len >= 6) cpm.push(len / (tm.speakMs / 60_000))
+        // 말 속도는 표본이 있을 때만: "안녕하세요" 한마디(5자·1초)로는 재지 않는다
+        const enough = lang === 'en' ? len >= 5 : len >= 12
+        if (enough && tm.speakMs >= 2000) { cpm.push(len / (tm.speakMs / 60_000)); s.cpmTurns++ }
       }
     }
     if (lang === 'en') {
@@ -123,7 +126,8 @@ export function describeSpeechForCoach(s: SpeechSummary): string {
   const L: string[] = []
   L.push(`- 내 발화 ${s.userTurns}회 (음성으로 시간 측정된 발화 ${s.timedTurns}회). 텍스트로 답한 턴은 시간 지표에서 제외.`)
   if (s.avgLatencyMs !== null) L.push(`- 첫 반응 지연: 평균 ${(s.avgLatencyMs / 1000).toFixed(1)}초, 최대 ${((s.maxLatencyMs ?? 0) / 1000).toFixed(1)}초 (내 발화 ${s.maxLatencyTurn}번째)`)
-  if (s.avgCpm !== null) L.push(`- 말 속도: 평균 ${s.avgCpm}${s.lang === 'en' ? ' wpm' : '자/분(공백 제외)'}`)
+  if (s.avgCpm !== null) L.push(`- 말 속도: 평균 ${s.avgCpm}${s.lang === 'en' ? ' wpm' : '자/분(공백 제외)'} (${s.cpmTurns}회 발화 기준)`)
+  else if (s.timedTurns > 0) L.push('- 말 속도: 답이 짧아(12자·2초 미만) 측정하지 않음. 속도를 평가하지 말 것')
   L.push(`- 답변 길이: 평균 ${s.avgAnswerChars}${s.lang === 'en' ? '단어' : '자'}, 최대 ${s.maxAnswerChars}${s.lang === 'en' ? '단어' : '자'}${s.avgAnswerSec !== null ? `, 평균 ${s.avgAnswerSec}초, 최장 ${s.maxAnswerSec}초 (내 발화 ${s.maxAnswerTurn}번째)` : ''}`)
   L.push(`- 필러(인식된 것만): ${s.fillers}회${s.fillerExamples.length ? ` (${s.fillerExamples.join(', ')})` : ''} · 완충 표현: ${s.hedges}회${s.hedgeExamples.length ? ` (${s.hedgeExamples.join(', ')})` : ''} · 단정 표현: ${s.assertives}회${s.assertiveExamples.length ? ` (${s.assertiveExamples.join(', ')})` : ''}`)
   if (s.completeRatio !== null) L.push(`- 문장 완결: ${s.completeRatio}% 의 발화가 끝맺음 어미로 끝남${s.incompleteTurns.length ? ` (말끝 흐림·연결어로 끝난 발화: ${s.incompleteTurns.join(', ')}번째)` : ''}`)

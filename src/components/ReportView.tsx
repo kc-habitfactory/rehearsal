@@ -119,6 +119,7 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
                 단정 표현 {speech.assertives}회 · 되묻기 {speech.questions}회
                 {speech.honorificMix && ' · 존댓말·반말 혼용'}
                 {speech.timedTurns === 0 && ' · 텍스트로 답해 속도·지연은 측정되지 않았습니다'}
+                {speech.timedTurns > 0 && speech.avgCpm === null && ' · 답이 짧아 말 속도는 재지 않았습니다(12자·2초 이상 발화 기준)'}
                 {speech.fillers > 0 && ' · 말버릇은 음성 인식이 들은 것만 셉니다'}
               </p>
               {report.speech && report.speech.length > 0 && <ul>{report.speech.map((t, i) => <li key={i}>{t}</li>)}</ul>}

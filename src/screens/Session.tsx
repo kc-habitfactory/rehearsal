@@ -51,12 +51,16 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
   const updateCurrent = (v: string) => { currentRef.current = v; setCurrent(v) }
   const updateInterim = (v: string) => {
     interimRef.current = v
-    if (v.trim() && firstSoundRef.current === null) firstSoundRef.current = performance.now() // 내 첫 소리
+    if (v.trim()) {
+      if (firstSoundRef.current === null) firstSoundRef.current = performance.now() // 내 첫 소리
+      lastSoundRef.current = performance.now() // 인식 텍스트가 마지막으로 바뀐 시각 ≈ 말이 끝난 시각 (침묵 대기 1.0~1.6초는 여기 안 들어감)
+    }
     setInterim(v)
   }
   // 말투 측정: 듣기 시작 시각, 첫 소리 시각
   const listenStartRef = useRef<number | null>(null)
   const firstSoundRef = useRef<number | null>(null)
+  const lastSoundRef = useRef<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
   const [error, setError] = useState<string | null>(null)
   // 실전 모드: 화면(카메라/통화)만 크게, 지표·자막·기록 숨김. 세션 중에도 끄고 켤 수 있다
@@ -245,6 +249,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
     setPhase('listening')
     listenStartRef.current = performance.now()
     firstSoundRef.current = null
+    lastSoundRef.current = null
     updateInterim('')
     if (textModeRef.current) return // 텍스트 모드: 입력창에서 제출을 기다린다
     const { stop } = listenOnce({
@@ -280,8 +285,8 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
   async function handleUserAnswer(text: string) {
     if (finishedRef.current) return
     const nonverbal = recent() ?? undefined
-    // 시간 지표: 텍스트 모드면 제외, 음성이면 첫 소리까지 지연과 말한 시간
-    const t0 = performance.now()
+    // 시간 지표: 텍스트 모드면 제외, 음성이면 첫 소리까지 지연과 말한 시간(첫 소리→마지막 인식 갱신. 침묵 대기는 제외)
+    const t0 = lastSoundRef.current ?? performance.now()
     const timing = textModeRef.current
       ? { textMode: true }
       : {
