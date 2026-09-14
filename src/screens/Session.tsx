@@ -336,7 +336,7 @@ export function Session({ setup, scenario, engine, stream, onFinish, resume }: P
         if (!full) setPhase('interviewer')
         full += d
         pendingRef.current = full
-        updateCurrent(full.replace('[END]', ''))
+        updateCurrent(full.replace('[END]', '').trimEnd())
         sp.push(d)
       }, ac.signal)
     } catch (e) {

@@ -74,7 +74,9 @@ export function Spectator({ userKey }: { userKey: string }) {
   const mm = String(Math.floor(shown / 60000)).padStart(2, '0')
   const ss = String(Math.floor((shown % 60000) / 1000)).padStart(2, '0')
   const lastTurn = turns[turns.length - 1]
-  const showCurrent = !ended && current && !(lastTurn?.role === 'interviewer' && lastTurn.text.replace(/…$/, '') === current.replace(/…$/, ''))
+  // 상대 응답이 기록에 들어간 뒤에도 재생이 남아 있는 동안 current 가 그대로라 같은 문장이 둘로 보였다. 공백·말줄임·[END] 차이를 무시하고 같으면(또는 기록이 현재 문장을 포함하면) 숨긴다
+  const norm = (t: string) => t.replace(/\[END\]/g, '').replace(/…$/, '').replace(/\s+/g, ' ').trim()
+  const showCurrent = !ended && current && !(lastTurn?.role === 'interviewer' && (norm(lastTurn.text) === norm(current) || norm(lastTurn.text).startsWith(norm(current))))
   const eye = metrics?.eyeContactPct
 
   return (
