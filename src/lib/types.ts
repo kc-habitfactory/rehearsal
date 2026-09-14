@@ -66,7 +66,9 @@ export interface Report {
   scoreBreakdown?: { item: string; max: number; score: number; note: string }[] // 항목별 배점
   speech?: string[] // 말투·전달 코멘트 (측정치 + 인용)
   speechProfile?: string // 이 상황이 선호하는 화법 한 줄
-  coverage?: { requirement: string; status: '증명' | '부분' | '미답' | '확인' | '미확인'; note: string }[] // 공고 요구사항 대비 (공고를 넣은 면접·면접관)
+  coverage?: { requirement: string; status: '증명' | '부분' | '미답' | '확인' | '미확인' | '발견' | '놓침'; note: string }[] // 요구사항·인사이트 대비 표
+  coverageTitle?: string // coverage 표 제목 (기본: 공고 요구사항 대비)
+  guideFixes?: string[] // 고객 인터뷰: 다음 가이드에 넣을 질문
   candidateReview?: string // 면접관 훈련: 지원자가 남길 법한 가상 후기
   verdict?: { pass: boolean; label: string; reread: string[] } // 회의 입장 점검: 판정과 다시 읽을 절
   questionsToAsk?: string[] // 회의 입장 점검: 회의에서 물어야 할 질문

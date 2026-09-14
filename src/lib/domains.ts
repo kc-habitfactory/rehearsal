@@ -1,6 +1,6 @@
 /* 훈련 도메인 정의 (클라이언트). 서버의 server/domains.ts와 id를 맞춘다. */
 
-export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher' | 'claim_appeal' | 'hiring_interviewer' | 'meeting_prep'
+export type DomainId = 'interview' | 'scam_call' | 'salary_negotiation' | 'exec_qa' | 'hospital' | 'immigration' | 'insurance_consult' | 'money_talk' | 'parent_teacher' | 'claim_appeal' | 'hiring_interviewer' | 'meeting_prep' | 'customer_interview'
 
 export interface FieldDef {
   key: string
@@ -402,6 +402,36 @@ export const DOMAINS: DomainDef[] = [
       { meeting: '시그널플래너 상담 신청 흐름 개편 킥오프', role: '기획', type: '킥오프' },
       { meeting: '5세대 실손 전환 안내 배너 기획 리뷰', role: '디자인', type: '기획 리뷰' },
       { meeting: '주간 스프린트 리뷰', role: '백엔드', type: '스프린트 리뷰' },
+    ],
+  },
+  {
+    id: 'customer_interview',
+    name: '고객 인터뷰 진행',
+    short: '고객 인터뷰',
+    description: '내가 인터뷰어가 되어 AI 고객을 인터뷰합니다. 고객은 표면 답("바빠서요")과 진짜 이유가 다르고, 감정 단어를 한 번 흘리고, 가이드에 없는 니즈를 숨기고 있습니다. 유도·닫힌 질문엔 예의상 동의나 단답만 합니다. The Mom Test 기준으로 질문 품질·구체화·감정 신호·경청·인사이트를 평가하고 다음 가이드 질문을 제안합니다.',
+    counterpart: '고객',
+    startLabel: '인터뷰 시작',
+    answerHint: '고객이 듣고 있습니다. 질문하세요',
+    usesCamera: true,
+    fields: [
+      { key: 'purpose', label: '인터뷰 목적', placeholder: '서비스 이용 후 경험 / 신규 기능 반응 / 이탈 사유 / 베타 피드백 / 만족도 심층' },
+      { key: 'product', label: '대상 서비스·기능', placeholder: '예: 시그널플래너 보험 분석 리포트' },
+      { key: 'customer', label: '고객 프로필', placeholder: '예: 34세 직장인, 리포트 본 뒤 상담 미신청' },
+      { key: 'goal', label: '알고 싶은 것 (2~3개)', placeholder: '예: 상담을 신청하지 않은 진짜 이유, 리포트에서 막힌 지점' },
+    ],
+    docs: [
+      { key: 'guide', label: '인터뷰 가이드·질문지 (선택)', hint: '준비한 질문지를 붙이면 고객이 그 질문에는 표면 답을 준비해 둡니다. 진짜 이유는 가이드 밖에 있어 따라가는 연습이 됩니다. 원문은 저장하지 않습니다.' },
+    ],
+    presets: [
+      { purpose: '이탈 사유 파악', product: '시그널플래너 보험 분석 리포트', customer: '34세 직장인, 리포트를 본 뒤 상담을 신청하지 않음', goal: '상담을 신청하지 않은 진짜 이유, 리포트에서 막힌 지점' },
+      { purpose: '이탈 사유 파악', product: '시그널플래너 앱', customer: '41세 자영업, 숨은보험금 조회 후 2주 뒤 앱 삭제', goal: '삭제 직전 순간, 기대와 경험의 차이, 되돌릴 조건' },
+      { purpose: '서비스 이용 후 경험 수집', product: '시그널파이낸셜랩 상담 통화', customer: '29세 첫 보험 가입 고민 중, 상담 후 가입하지 않음', goal: '상담 중 불편했던 순간, 결정을 미룬 이유' },
+      { purpose: '신규 기능 반응 조사', product: '5세대 실손 전환 안내 배너', customer: '45세 4세대 실손 가입자, 배너를 보고 눌렀다가 나감', goal: '배너에서 기대한 것, 눌러서 본 화면에서 한 행동' },
+      { purpose: '베타 테스트 피드백', product: '보험료 납입 알림 신규 기능(베타)', customer: '38세 맞벌이, 베타 2주 사용', goal: '막힌 지점과 우회 행동, 계속 쓸지와 그 이유' },
+      { purpose: '고객 만족도 심층 조사', product: '보험 분석 리포트', customer: '52세, NPS 9점을 준 고객', goal: '"좋았다"의 구체 장면, 주변에 추천한 실제 상황' },
+      { purpose: '이탈 사유 파악', product: '구독형 가계부 앱', customer: '27세 직장인, 3개월 뒤 구독 해지', goal: '해지 직전 결정적 순간, 지금 대신 쓰는 것' },
+      { purpose: '신규 기능 반응 조사', product: '커머스 앱 AI 추천 탭', customer: '33세, 새 탭을 두 번 열고 더 안 씀', goal: '처음 열었을 때 기대, 두 번째에 실망한 지점' },
+      { purpose: '베타 테스트 피드백', product: '사내 회의록 자동 요약 도구(베타)', customer: '개발팀 리드, 회의 5회 사용', goal: '요약을 신뢰하지 않게 된 순간, 실제 워크플로에서의 위치' },
     ],
   },
 ]

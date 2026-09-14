@@ -106,6 +106,12 @@ const P: Record<string, SpeechProfile> = {
     dislikes: ['배경 설명부터 시작', '"아마… 같습니다" 추측', '문서에 없는 내용을 확신 있게', '질문 하나에 30초 이상'],
     cpm: [280, 380], answerSec: [5, 30], latencySec: [0.5, 4],
   },
+  researcher: {
+    key: 'researcher', name: '인터뷰어형: 짧은 열린 질문, 듣는 시간이 말하는 시간의 세 배, 침묵 3초',
+    likes: ['"그때 상황을 조금 더 말씀해 주세요" 같은 열린 질문 한 문장', '과거의 구체 순간 묻기', '고객 말을 그대로 되돌려주는 거울 질문', '침묵을 3초 견디기', '요약 되짚기'],
+    dislikes: ['"편하셨죠?" 유도 질문', '"쓰실 건가요?" 미래 예측', '서비스 설명·변호', '질문 두 개를 한 번에', '인터뷰어 발화 30% 초과'],
+    cpm: [250, 340], answerSec: [3, 15], latencySec: [1, 4],
+  },
   consultant: {
     key: 'consultant', name: '상담사형: 쉬운 말로 한 번에 하나씩, 단정하지 않고, 제안 뒤 침묵을 견디기',
     likes: ['고객 상황을 먼저 묻고 되짚기("~하신 거죠?")', '전문용어는 비유·예시로, 한 번에 한 가지', '"고객님 상황에서는 ~한 경우 유리합니다"처럼 조건부 표현', '핵심 제안 뒤 3~5초 침묵, 결정 재촉 금지', '거절에는 압박 대신 "한두 달 뒤 안부 겸 연락" 수준의 후속 약속'],
@@ -142,6 +148,7 @@ export function speechProfileFor(domainId: string, fields: Record<string, string
     case 'claim_appeal': return P.claimant
     case 'hiring_interviewer': return P.interviewer
     case 'meeting_prep': return P.briefing
+    case 'customer_interview': return P.researcher
     default: return P.general
   }
 }

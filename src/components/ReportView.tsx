@@ -126,15 +126,21 @@ export function ReportView({ title, durationMs, turns, events, overall: o, repor
           )}
           {report.coverage && report.coverage.length > 0 && (
             <section className="coverage">
-              <h3>공고 요구사항 대비</h3>
+              <h3>{report.coverageTitle ?? '공고 요구사항 대비'}</h3>
               <div className="coverage-list">
                 {report.coverage.map((c, i) => (
-                  <div key={i} className={`coverage-row ${c.status === '증명' || c.status === '확인' ? 'ok' : c.status === '부분' ? 'partial' : 'miss'}`}>
+                  <div key={i} className={`coverage-row ${c.status === '증명' || c.status === '확인' || c.status === '발견' ? 'ok' : c.status === '부분' ? 'partial' : 'miss'}`}>
                     <span className="cov-status">{c.status}</span>
                     <div><div className="cov-req">{c.requirement}</div><div className="muted small">{c.note}</div></div>
                   </div>
                 ))}
               </div>
+            </section>
+          )}
+          {report.guideFixes && report.guideFixes.length > 0 && (
+            <section>
+              <h3>다음 인터뷰 가이드에 넣을 질문</h3>
+              <ul>{report.guideFixes.map((q, i) => <li key={i}>{q}</li>)}</ul>
             </section>
           )}
           {report.questionsToAsk && report.questionsToAsk.length > 0 && (

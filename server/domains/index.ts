@@ -15,6 +15,7 @@ import { parentTeacher } from './parent-teacher'
 import { claimAppeal } from './claim-appeal'
 import { hiringInterviewer } from './hiring-interviewer'
 import { meetingPrep } from './meeting-prep'
+import { customerInterview } from './customer-interview'
 
 export type { DomainId, DomainPrompts, ScenarioLike, NoteWhere } from './shared'
 export { knownFacts, TTS_INSTRUCTIONS_EN_DEFAULT } from './shared'
@@ -32,6 +33,7 @@ export const DOMAIN_PROMPTS: Record<DomainId, DomainPrompts> = {
   claim_appeal: claimAppeal,
   hiring_interviewer: hiringInterviewer,
   meeting_prep: meetingPrep,
+  customer_interview: customerInterview,
 }
 
 export function getDomain(id: unknown): DomainPrompts {

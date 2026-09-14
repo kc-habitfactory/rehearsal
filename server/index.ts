@@ -57,7 +57,7 @@ function setupHash(domainId: string, input: string) {
 }
 
 /** 긴 문서(공고·이력서·기획 문서)가 붙은 요청인지. 매번 고유하므로 풀을 채우지 않고 출력 토큰도 넉넉히 */
-const hasDocs = (f: Record<string, string>) => ['jd', 'resume', 'spec'].some((k) => (f[k] ?? '').trim().length > 0)
+const hasDocs = (f: Record<string, string>) => ['jd', 'resume', 'spec', 'guide'].some((k) => (f[k] ?? '').trim().length > 0)
 
 async function generateScenario(domainId: string, input: string, fields: Record<string, string> = {}) {
   // 공고·이력서가 붙으면 요약·요구사항·커버리지 계획까지 나와 출력이 길다. 1500이면 잘려서 opening이 사라진다

@@ -163,6 +163,7 @@ export function Prep({ setup, engineRef, streamRef, onReady, onBack }: Props) {
     claim_appeal: ['부지급이 정당한지 애매한지 정하는 중', '약관 근거와 인정 범위를 정하는 중', '담당자 전술 순서를 짜는 중', '돌발 변수를 심는 중', '콜센터 첫 인사를 다듬는 중'],
     hiring_interviewer: ['지원자 유형을 정하는 중', '이력서에 과장 항목을 심는 중', '질문 유형별 반응 규칙을 짜는 중', '역질문을 준비하는 중', '첫 인사를 다듬는 중'],
     meeting_prep: ['문서에서 목적·결정 사항을 뽑는 중', '역할에 맞는 문항을 고르는 중', '정답 요지와 채점 기준을 적는 중', '되묻기 규칙을 정하는 중', '첫 문항을 다듬는 중'],
+    customer_interview: ['고객 유형을 정하는 중', '표면 답과 진짜 이유를 나누는 중', '감정 단어와 숨은 니즈를 심는 중', '유도·닫힌 질문 반응을 정하는 중', '첫 인사를 다듬는 중'],
   }
   const stageMsgs = STAGES[dom.id] ?? STAGES.interview
   const timedMsg = stageMsgs[Math.min(stageMsgs.length - 1, Math.floor(scenarioElapsed / 4))]
