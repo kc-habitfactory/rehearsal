@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     host: true, // 0.0.0.0 바인딩. 같은 와이파이의 다른 기기에서도 접근 가능
     port: 5173,
-    allowedHosts: [TUNNEL_HOST, '.ngrok-free.app', '.ngrok.app'],
+    allowedHosts: [TUNNEL_HOST, '.ngrok-free.app', '.ngrok.app', '.trycloudflare.com'], // ngrok 무료 한도 초과 시 cloudflared 임시 터널로 대체
     proxy: {
       '/api': { target: 'http://localhost:8787', changeOrigin: true },
       '/ws': { target: 'ws://localhost:8787', ws: true },
