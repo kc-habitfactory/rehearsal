@@ -60,11 +60,12 @@ function setupHash(domainId: string, input: string) {
 const hasDocs = (f: Record<string, string>) => ['jd', 'resume', 'spec', 'guide'].some((k) => (f[k] ?? '').trim().length > 0)
 
 async function generateScenario(domainId: string, input: string, fields: Record<string, string> = {}) {
-  // 공고·이력서가 붙으면 요약·요구사항·커버리지 계획까지 나와 출력이 길다. 1500이면 잘려서 opening이 사라진다
+  // 공고·이력서가 붙으면 요약·요구사항·커버리지 계획까지 나와 출력이 길다. 1500이면 잘려서 opening이 사라진다.
+  // 2000도 보험 종류별 쟁점·만족 조건이 들어간 hiddenPlan에서 잘린 사례가 있어(2026-09-18) 3500으로 올리고, 설계자에게 hiddenPlan 길이 상한도 준다
   const long = hasDocs(fields)
   const msg = await client!.messages.create({
     model: SCENARIO_MODEL,
-    max_tokens: long ? 4000 : 2000,
+    max_tokens: long ? 6000 : 3500,
     output_config: { effort: 'low' },
     system: buildDesignerSystem(getDomain(domainId), fields),
     messages: [{ role: 'user', content: input }],

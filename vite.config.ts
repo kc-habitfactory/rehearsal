@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // 외부에서 접근할 때 쓰는 터널 주소. ngrok을 5173으로 열면 /api도 프록시를 타고 함께 나간다.
-const TUNNEL_HOST = 'regular-usefully-hen.ngrok-free.app'
+const TUNNEL_HOST = 'logical-especially-silkworm.ngrok-free.app'
 
 // https://vite.dev/config/
 export default defineConfig({

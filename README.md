@@ -24,7 +24,7 @@ npm run dev               # 웹 http://localhost:5173 + API http://localhost:878
 ### 외부 공유 (ngrok)
 
 ```bash
-ngrok http 5173 --url=regular-usefully-hen.ngrok-free.app
+ngrok http 5173 --url=logical-especially-silkworm.ngrok-free.app
 ```
 
 터널은 5173 하나만 열면 된다. `/api` 요청은 Vite 프록시가 8787로 넘긴다. 다른 ngrok 주소를 쓰면 `vite.config.ts`의 `TUNNEL_HOST`를 바꾼다. 카메라·마이크는 https에서만 열리는데 ngrok이 https를 제공하므로 휴대폰이나 다른 노트북에서도 바로 된다. 첫 접속 시 ngrok 경고 페이지에서 Visit Site를 눌러야 한다.
@@ -337,7 +337,7 @@ MediaPipe Face Landmarker(얼굴 478점 + 회전 행렬 + 표정 계수 52개)�
 | `/api/turn` | sonnet-4-6 | SSE 텍스트 스트림 | 구어체·짧은 문장, 질문 하나, 답변에 한 번 반응 후 다음 질문. hiddenPlan의 만족 조건이 채워지거나 `maxUserTurns`에 닿으면 `[END]` |
 | `/api/report` | fable-5 → 실패 시 opus-4-8 | JSON: score, headline, strengths, improvements, perQuestion, nonverbal, nextTraining, scoreBreakdown(항목별 max·score·근거, 합계 = score) | 구체적으로. 비언어는 타임라인 사실로. 성격·감정 단정 금지 |
 
-모델 출력 JSON은 `parseJsonWithRepair`로 읽는다. 문자열 안 쌍따옴표 같은 문법 오류면 빠른 모델(sonnet)로 문법만 고쳐 한 번 더 파싱한다. 출력이 길어져 잘리면(공고·이력서가 붙은 시나리오, 배점·말투·커버리지가 있는 리포트) 복구 과정에서 뒷부분이 통째로 사라지므로 토큰 한도를 넉넉히 두고(시나리오 2000, 문서 있으면 4000 / 리포트 6000) 필수 필드(시나리오: title·opening·hiddenPlan·interviewer, 리포트: score·headline·strengths·improvements·nextTraining)가 없으면 실패로 던져 재시도·폴백으로 넘긴다. 설계자·코치 프롬프트 끝에는 "문자열 안 인용은 홑따옴표" 규칙이 붙는다.
+모델 출력 JSON은 `parseJsonWithRepair`로 읽는다. 문자열 안 쌍따옴표 같은 문법 오류면 빠른 모델(sonnet)로 문법만 고쳐 한 번 더 파싱한다. 출력이 길어져 잘리면(공고·이력서가 붙은 시나리오, 배점·말투·커버리지가 있는 리포트) 복구 과정에서 뒷부분이 통째로 사라지므로 토큰 한도를 넉넉히 두고(시나리오 3500, 문서 있으면 6000 / 리포트 6000. 설계자에게 hiddenPlan 900자 상한도 준다) 필수 필드(시나리오: title·opening·hiddenPlan·interviewer, 리포트: score·headline·strengths·improvements·nextTraining)가 없으면 실패로 던져 재시도·폴백으로 넘긴다. 설계자·코치 프롬프트 끝에는 "문자열 안 인용은 홑따옴표" 규칙이 붙는다.
 
 ### 5.6 저장소 (MySQL + Redis)
 
